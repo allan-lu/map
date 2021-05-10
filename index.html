@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>NYC Sewer Data Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <link
+      rel="stylesheet"
+      href="node_modules/leaflet-search/src/leaflet-search.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="node_modules/leaflet.zoomhome/src/css/leaflet.zoomhome.css"
+    />
+    <link
+      rel="stylesheet"
+      href="node_modules/leaflet-sidebar-v2/css/leaflet-sidebar.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css"
+    />
+    <link
+      rel="stylesheet"
+      href="node_modules/leaflet-draw/dist/leaflet.draw.css"
+    />
+    <script defer src="js/functions.js"></script>
+    <script defer src="js/styles.js"></script>
+    <script defer src="js/scripts.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <script src="node_modules/leaflet-search/src/leaflet-search.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.js"></script>
+    <script src="node_modules/leaflet.zoomhome/dist/leaflet.zoomhome.js"></script>
+    <script src="node_modules/leaflet-makimarkers/Leaflet.MakiMarkers.js"></script>
+    <script src="node_modules/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
+    <script src="node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6.3.0/turf.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid d-flex flex-column vh-100 overflow-hidden">
+      <div class="header bg-light">
+        <h1 class="text-center">NYC Sewer Data Map</h1>
+      </div>
+      <div id="middle-container" class="row d-flex flex-grow-1 overflow-hidden">
+        <div
+          id="nbhd-container"
+          class="panel col-2 pb-2 border mh-100 d-flex flex-column overflow-hidden"
+        >
+          <div id="nbhd-header" class="row bg-dark py-2">
+            <h4 class="col text-white text-center">Neighborhoods</h4>
+          </div>
+          <ul
+            id="nbhd-list"
+            class="row list-group flex-nowrap overflow-auto"
+          ></ul>
+        </div>
+        <div id="map-container" class="col">
+          <div id="mapid" class="unselectable"></div>
+        </div>
+        <div id="sidebar" class="leaflet-sidebar collapsed bg-white">
+          <div class="leaflet-sidebar-tabs">
+            <ul role="tablist">
+              <li title="Information">
+                <a href="#info" role="tab"
+                  ><i class="far fa-question-circle pl-1"></i
+                ></a>
+              </li>
+              <li title="Attributes">
+                <a href="#attributes" role="tab"
+                  ><i class="fa fa-bars pl-1"></i
+                ></a>
+              </li>
+              <li title="Charts">
+                <a href="#charts" role="tab"
+                  ><i class="fa fa-chart-bar pl-1"></i
+                ></a>
+              </li>
+            </ul>
+          </div>
+          <div class="leaflet-sidebar-content">
+            <div id="info" class="leaflet-sidebar-pane">
+              <h1 class="leaflet-sidebar-header">
+                Information
+                <div class="leaflet-sidebar-close">
+                  <i class="fa fa-caret-right"></i>
+                </div>
+              </h1>
+            </div>
+            <div id="attributes" class="leaflet-sidebar-pane">
+              <h1 class="leaflet-sidebar-header">
+                Attributes
+                <div class="leaflet-sidebar-close">
+                  <i class="fa fa-caret-right"></i>
+                </div>
+              </h1>
+              <ul id="attr-list" class="leaflet-sidebar-inner list-group">
+                <h6 id="attr-blank" class="p-2">
+                  Select a neighborhood polygon to view its properties.
+                </h6>
+              </ul>
+            </div>
+            <div id="charts" class="leaflet-sidebar-pane">
+              <h1 class="leaflet-sidebar-header">
+                Charts & Graphs
+                <div class="leaflet-sidebar-close">
+                  <i class="fa fa-caret-right"></i>
+                </div>
+              </h1>
+              <div id="charts-container" class="leaflet-sidebar-inner">
+                <h6 id="charts-blank" class="p-2">
+                  Use the polygon selector tools to view charts comparing data
+                  between neighborhoods.
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer row bg-light justify-content-between">
+        <div class="px-2">
+          <p class="m-0">
+            *Neighborhood selections are actually
+            <a
+              href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
+              target="_blank"
+              rel="noreferrer noopener"
+              class="text-info"
+            >
+              neighborhood tabulation areas</a
+            >. Dataset was compiled in PostgresSQL.
+          </p>
+          <p id="sources" class="m-0">
+            Data Sources: NYC Departments of
+            <a
+              href="https://www1.nyc.gov/site/planning/index.page"
+              target="_blank"
+              rel="noreferrer noopener"
+              >~ City Planning</a
+            >,
+            <a
+              href="https://www1.nyc.gov/site/dep/index.page"
+              target="_blank"
+              rel="noreferrer noopener"
+              >~ Environmental Protection</a
+            >,
+            <a
+              href="https://www1.nyc.gov/site/doitt/index.page"
+              target="_blank"
+              rel="noreferrer noopener"
+              >~ Information Technology & Telecommunications</a
+            >,
+            <a
+              href="https://www.nycgovparks.org/"
+              target="_blank"
+              rel="noreferrer noopener"
+              >~ Parks & Recreation</a
+            >, and
+            <a
+              href="https://openseweratlas.tumblr.com"
+              target="_blank"
+              rel="noreferrer noopener"
+              >Open Sewer Atlas NYC</a
+            >
+          </p>
+        </div>
+        <div class="px-2 bg-light d-flex align-items-end">
+          <p class="m-0">Author: Allan Lu</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
