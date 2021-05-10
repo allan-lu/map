@@ -154,7 +154,7 @@ const selectAndZoom = (props, gid, bounds, pad) => {
 const zoomToSelection = (bounds, pad = [0, 0]) => {
   // If sidebar is open pan map over
   if (!$("#sidebar").hasClass("collapsed")) {
-    const zoom = myMap.getBoundsZoom(bounds, false, pad)
+    const zoom = Math.min(18, Math.max(11, myMap.getBoundsZoom(bounds, false, pad)))
     const sidebarWidth = $(".leaflet-sidebar-pane").width() - 36
     let center = L.CRS.Simple.latLngToPoint(bounds.getCenter(), zoom)
     center.x += sidebarWidth
@@ -570,7 +570,10 @@ const createChart = (attrObj, property) => {
   const barHeight = 15
   const height =
     Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
-  const width = $(".leaflet-sidebar-pane").width()
+  const width =
+    $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
+      : $(window).width() - 40
   const x = d3
     .scaleLinear()
     .domain([0, d3.max(data, d => d[property])])
@@ -605,7 +608,7 @@ const createChart = (attrObj, property) => {
     .select("#charts-container")
     .append("svg")
     .attr("id", property)
-    .attr("preserveAspectRatio", "xMidYMid meet")
+    .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [0, 0, width, height])
 
   const bar = svg
