@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>NYC Sewer Data Map</title>
+    <title>New York City Sewer Data</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
@@ -78,12 +78,21 @@
   <body>
     <div class="container-fluid d-flex flex-column vh-100 overflow-hidden">
       <div class="header bg-light">
-        <h1 class="text-center">NYC Sewer Data Map</h1>
+        <h1 class="text-center">New York City Sewer Data</h1>
       </div>
       <div id="middle-container" class="row d-flex flex-grow-1 overflow-hidden">
         <div
           id="nbhd-container"
-          class="panel col-2 pb-2 border mh-100 d-flex flex-column overflow-hidden"
+          class="
+            panel
+            col-2
+            pb-2
+            border
+            mh-100
+            d-flex
+            flex-column
+            overflow-hidden
+          "
         >
           <div id="nbhd-header" class="row bg-dark py-2">
             <h4 class="col text-white text-center">Neighborhoods</h4>
@@ -99,9 +108,9 @@
         <div id="sidebar" class="leaflet-sidebar collapsed bg-white">
           <div class="leaflet-sidebar-tabs">
             <ul role="tablist">
-              <li title="Information">
-                <a href="#info" role="tab"
-                  ><i class="far fa-question-circle pl-1"></i
+              <li title="Introduction">
+                <a href="#intro" role="tab"
+                  ><i class="fas fa-star-of-life pl-1"></i
                 ></a>
               </li>
               <li title="Attributes">
@@ -111,19 +120,46 @@
               </li>
               <li title="Charts">
                 <a href="#charts" role="tab"
-                  ><i class="fa fa-chart-bar pl-1"></i
+                  ><i class="fa fa-chart-bar pl-1"></span></i
                 ></a>
               </li>
             </ul>
           </div>
           <div class="leaflet-sidebar-content">
-            <div id="info" class="leaflet-sidebar-pane">
+            <div id="intro" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
-                Information
+                Introduction
                 <div class="leaflet-sidebar-close">
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
+              <div
+                class="leaflet-sidebar-inner p-1 m-1"
+                style="line-height: 100%"
+              >
+                <h6>
+                  &emsp; More than two-thirds of New York City's sewer system is
+                  a combined system where rainwater runoff, domestic sewage and
+                  industrial wastewater are collected in the same pipe and
+                  treated together at a wastewater treatment plant. During
+                  periods of heavy rainfall or snowmelt, the wastewater can
+                  exceed the capacity of the system or treatment plant and the
+                  excess wastewater is discharged directly to nearby streams,
+                  rivers, or other bodies of water.
+                  <br />
+                  &emsp; In 2010, the city’s Department of Environmental
+                  Protection implemented the NYC Green Infrastructure (GI)
+                  Program which uses manufactured landscapes to mimic natural
+                  systems in managing stormwater runoff. Some examples include
+                  rain gardens, stormwater greenstreets, green roofs and
+                  permeable paving.
+                  <br />
+                  &emsp; The purpose of this map is to provide a comprehensive
+                  visualization of green infrastructure and sewer data at the
+                  neighborhood level. Its interactivity allows for the user to 
+                  select and compare attributes of multiple areas.
+                </h6>
+              </div>
             </div>
             <div id="attributes" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">

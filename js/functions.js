@@ -1,4 +1,5 @@
 const displayAttributes = property => {
+  // $.isEmptyObject(property)
   const boroughs = property.geoid.split(", ").map(getBorough)
   property.borough = [...new Set(boroughs)].join(", ")
 

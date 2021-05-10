@@ -167,28 +167,32 @@ const defaultBounds = myMap.getBounds()
 // Add CSA percentage legend
 const legend = L.control({ position: "bottomleft" })
 legend.onAdd = map => {
-  let grades
-  let colorFunc
+  let grades, colorFunc, title
   const div = L.DomUtil.create("div", "info legend")
 
   if (map.hasLayer(ntaCSA)) {
     grades = [0, 0.072, 0.273, 0.554, 0.739, 0.861, 0.948]
     colorFunc = getChoroColorCSA
-  } else {
+    title = "Percent of Combined <br> Sewer Areas"
+    
+    } else {
     grades = [0, 0.368, 0.487, 0.581, 0.67, 0.756, 0.829]
     colorFunc = getChoroColorImperv
+    title = "Percent of <br> Impervious Land"
   }
 
+  let labels = [title]
   for (let i = 0; i < grades.length; i++) {
-    div.innerHTML +=
+    labels.push(
       '<i style="background:' +
       colorFunc(grades[i] + 0.01) +
       '"></i> ' +
       grades[i] +
       (grades[i + 1]
-        ? "&ndash;" + (grades[i + 1] - 0.001) + "<br>"
-        : "&ndash;1")
+        ? "&ndash;" + (grades[i + 1] - 0.001)
+        : "&ndash;1"))
   }
+  div.innerHTML = labels.join("<br>")
   return div
 }
 legend.addTo(myMap)
@@ -456,7 +460,6 @@ myMap.on({
     myMap.addControl(legend)
   },
   "draw:toolbaropened": e => {
-    const prop = "neighborhood"
     ntaCSA.eachLayer(layer => {
       layer.off()
     })
@@ -470,6 +473,10 @@ myMap.on({
     const layer = e.layer
 
     const selectedFeatures = selectMultiple(layer)
+    // If no polygons selected end drawing
+    if (selectedFeatures.length === 0) {
+      return
+    }
     const selectedAttr = createAttrObj(selectedFeatures)
     combineProperties(selectedAttr)
 
@@ -480,6 +487,9 @@ myMap.on({
     const layer = e.layers.getLayers()[0]
 
     const selectedFeatures = selectMultiple(layer)
+    if (selectedFeatures.length === 0) {
+      return
+    }
     const selectedAttr = createAttrObj(selectedFeatures)
     combineProperties(selectedAttr)
     createChart(selectedAttr, "gi_count")
