@@ -6,6 +6,8 @@ const mediaQuery = window.matchMedia("(min-width: 768px)")
 const gidArray = []
 const selectedLayerGroup = L.featureGroup({ pane: "polygonsPane" })
 
+// INITIALIZING LAYERS //
+// BASE LAYERS //
 const mbLight = L.tileLayer(mapboxURL, {
   id: "mapbox/light-v10",
   tileSize: 512,
@@ -24,6 +26,8 @@ const mbStreets = L.tileLayer(mapboxURL, {
   accessToken: accessToken
 })
 
+// OVERLAY LAYERS
+// Sewershed Choropleths
 const ntaCSA = L.geoJSON(null, {
   style: myStyle.csaChoro,
   onEachFeature: onEachNTAFeature,
@@ -48,6 +52,7 @@ const ntaImpervious = L.geoJSON(null, {
 
 const ntaLayerGroup = L.featureGroup([ntaCSA, ntaImpervious])
 
+// Wastewater Treatment Plants
 const plants = L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     return L.marker(latlng, { icon: tpIcon })
@@ -58,6 +63,7 @@ const plants = L.geoJSON(null, {
   }
 })
 
+// CSO Outfalls
 const outfalls = L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     return L.circleMarker(latlng, myStyle.outfalls)
@@ -65,11 +71,13 @@ const outfalls = L.geoJSON(null, {
   // onEachFeature: onEachOutfall,
 })
 
+// Sewer Interceptors
 const interceptors = L.geoJSON(null, {
   style: myStyle.interceptors,
   pane: "linesPane"
 })
 
+// Sewersheds
 const sewersheds = L.geoJSON(null, {
   style: myStyle.sewersheds,
   onEachFeature: onEachSewershed,
@@ -81,13 +89,14 @@ const sewersheds = L.geoJSON(null, {
   pane: "polygonsPane"
 })
 
+// Different Sewer Type Areas
 const sewerAreas = L.geoJSON(null, {
   style: myStyle.sewerAreas,
   onEachFeature: onEachSewerArea,
   pane: "polygonsPane"
 })
 
-// Create green infrastructures marker layers by construction status
+// Green infrastructures marker layers by construction status
 const giConstructed = L.geoJSON(null, {
   filter: feature => {
     return ["Constructed"].some(str => feature.properties.status.includes(str))
@@ -122,7 +131,7 @@ const giClusters = L.markerClusterGroup({
   singleMarkerMode: true
 })
 
-// Create 311 call layers related to sewer issues
+// 311 call layers related to sewer issues
 const callsFlooding = L.geoJSON(null, {
   filter: feature => {
     return ["SC", "IDG", "SA1", "SA", "SJ"].some(str =>
@@ -158,7 +167,8 @@ const myMap = L.map("mapid", {
   zoomControl: false,
   maxBounds: L.latLngBounds(L.latLng(40.43, -74.7), L.latLng(40.98, -73.1)),
   minZoom: 10,
-  fullscreenControl: { pseudoFullscreen: true }
+  fullscreenControl: { pseudoFullscreen: true },
+  tap: false // remove touch screen problems?
 })
 
 // Get bounds for default view
@@ -172,12 +182,12 @@ legend.onAdd = map => {
 
   if (map.hasLayer(ntaCSA)) {
     grades = [0, 0.072, 0.273, 0.554, 0.739, 0.861, 0.948]
-    colorFunc = getChoroColorCSA
+    colorFunc = myStyle.getChoroColorCSA
     title = "Percent of Combined <br> Sewer Areas"
     
     } else {
     grades = [0, 0.368, 0.487, 0.581, 0.67, 0.756, 0.829]
-    colorFunc = getChoroColorImperv
+    colorFunc = myStyle.getChoroColorImperv
     title = "Percent of <br> Impervious Land"
   }
 
@@ -403,8 +413,6 @@ const sidebar = L.control
   })
   .addTo(myMap)
 
-// resizeObserver.observe(document.querySelector(".leaflet-sidebar-pane"))
-
 // Rectangular area selector
 const drawOptions = {
   position: "topright",
@@ -446,9 +454,7 @@ L.drawLocal.edit.toolbar.buttons.removeDisabled = "No selector to delete"
 L.EditToolbar.Delete.include({
   enable: () => {
     clearNTAs()
-    zoomToSelection(defaultBounds)
-    drawnItems.clearLayers()
-    d3.select("#charts-container #charts-blank").classed("d-block", true)
+    zoomToBounds(defaultBounds)
   }
 })
 
@@ -482,6 +488,8 @@ myMap.on({
 
     createChart(selectedAttr, "gi_count")
     createChart(selectedAttr, "csa_pct")
+
+    createPies(selectedAttr)
   },
   "draw:edited": e => {
     const layer = e.layers.getLayers()[0]
@@ -494,5 +502,7 @@ myMap.on({
     combineProperties(selectedAttr)
     createChart(selectedAttr, "gi_count")
     createChart(selectedAttr, "csa_pct")
+
+    createPies(selectedAttr)
   }
 })

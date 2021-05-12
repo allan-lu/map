@@ -1,3 +1,4 @@
+// Add NTA attributes to a div in the sidebar
 const displayAttributes = property => {
   // $.isEmptyObject(property)
   const boroughs = property.geoid.split(", ").map(getBorough)
@@ -39,6 +40,7 @@ const displayAttributes = property => {
   $("#attr-borough").remove().insertBefore($("#attr-geoid"))
 }
 
+// Add events to each NTA polygon
 const onEachNTAFeature = (feature, layer) => {
   const prop = "neighborhood"
   // Add events to the polygons
@@ -52,10 +54,19 @@ const onEachNTAFeature = (feature, layer) => {
       removePopup(e)
     },
     mousemove: movePopup,
-    click: selectFeature
+    click: e => {
+      const target = e.target
+      const properties = target.feature.properties
+      const gid = target.feature.properties.gid
+      const bounds = target.getBounds()
+      const padding = [90, 90]
+
+      selectAndZoom(properties, gid, bounds, padding)
+    }
   })
 }
 
+// Add popups that show name of the polygon
 const displayPopup = (e, prop) => {
   const target = e.target
   const feature = target.feature
@@ -75,7 +86,6 @@ const displayPopup = (e, prop) => {
   const popupContent = `<h6><strong>${attribute}:</strong><br>${property}</h6>`
   target
     .bindPopup(popupContent, {
-      // maxWidth: 160,
       autoPan: false,
       closeButton: false,
       interactive: false,
@@ -89,15 +99,17 @@ const removePopup = e => {
   target.closePopup()
 }
 
+// Track popup with the location of cursor
 const movePopup = e => {
   const target = e.target
   target.openPopup(e.latlng)
 }
 
+// Highlight the NTA polygon
 const highlightFeature = e => {
   const target = e.target
   const gid = target.feature.properties.gid
-  if (checkSelected(gid)) {
+  if (gidArray.includes(gid)) {
     // Highlight bar in bar chart
     highlightSelected(null, target.feature.properties)
   } else {
@@ -105,34 +117,38 @@ const highlightFeature = e => {
   }
 }
 
+// Reset the highlighted polygon to previous style
 const resetToDefault = e => {
   const target = e.target
   const gid = target.feature.properties.gid
-  const styleDefault = target.defaultOptions.style(target.feature)
+  const stylePrev = target.defaultOptions.style(target.feature)
 
-  if (checkSelected(gid)) {
+  if (gidArray.includes(gid)) {
     // Reset bar chart highlight
     unhighlightSelected(null, target.feature.properties)
   } else {
-    target.setStyle(styleDefault)
+    target.setStyle(stylePrev)
   }
 }
 
-const selectFeature = e => {
-  const target = e.target
-  const properties = target.feature.properties
-  const gid = target.feature.properties.gid
-  const bounds = target.getBounds()
-  const padding = [90, 90]
-
-  selectAndZoom(properties, gid, bounds, padding)
-}
-
+// Select and zoom to polygon(s)
 const selectAndZoom = (props, gid, bounds, pad) => {
   if (gidArray.includes(gid)) {
     // Selecting an already selected feature will unselect it on both the map
     // and the neighborhood list panel
-    unselectNTA(gid)
+    clearNTAs()
+
+    // // Set zoom level to default
+    zoomToBounds(defaultBounds)
+
+    // Remove the layers from the selected layer group
+    ntaLayerGroup.eachLayer(layer => {
+      layer.eachLayer(i => {
+        if (i.feature.properties.gid === gid) {
+          selectedLayerGroup.removeLayer(i)
+        }
+      })
+    })
   } else {
     clearNTAs()
 
@@ -143,19 +159,18 @@ const selectAndZoom = (props, gid, bounds, pad) => {
     displayAttributes(props)
 
     // Zoom to selected feature
-    zoomToSelection(bounds, pad)
+    zoomToBounds(bounds, pad)
   }
-
-  // Clear polygon selector layer
-  drawnItems.clearLayers()
-  // Remove charts from empty container and display text
-  d3.select("#charts-container #charts-blank").classed("d-block", true)
 }
 
-const zoomToSelection = (bounds, pad = [0, 0]) => {
+// Zoom to given bounds
+const zoomToBounds = (bounds, pad = [0, 0]) => {
   // If sidebar is open pan map over
   if (!$("#sidebar").hasClass("collapsed")) {
-    const zoom = Math.min(18, Math.max(11, myMap.getBoundsZoom(bounds, false, pad)))
+    const zoom = Math.min(
+      18,
+      Math.max(11, myMap.getBoundsZoom(bounds, false, pad))
+    )
     const sidebarWidth = $(".leaflet-sidebar-pane").width() - 36
     let center = L.CRS.Simple.latLngToPoint(bounds.getCenter(), zoom)
     center.x += sidebarWidth
@@ -166,10 +181,7 @@ const zoomToSelection = (bounds, pad = [0, 0]) => {
   }
 }
 
-const checkSelected = feature => {
-  return gidArray.includes(feature)
-}
-
+// Actions performed when an NTA is selected
 const selectNTA = gid => {
   // // Highlight and scroll to selected neighborhood on the left side
   $(`#${gid}`).css("background-color", "rgba(126, 186, 73, 0.3)")
@@ -188,22 +200,7 @@ const selectNTA = gid => {
   gidArray.push(gid)
 }
 
-const unselectNTA = gid => {
-  clearNTAs()
-
-  // // Set zoom level to default
-  zoomToSelection(defaultBounds)
-
-  // Remove the layers from the selected layer group and reset their style
-  ntaLayerGroup.eachLayer(layer => {
-    layer.eachLayer(i => {
-      if (i.feature.properties.gid === gid) {
-        selectedLayerGroup.removeLayer(i)
-      }
-    })
-  })
-}
-
+// Clearing visual properties and removing selected NTAs from layer group and array
 const clearNTAs = () => {
   // Unselect element from left panel and clear attribute container
   $(".list-group-item").css("background-color", "")
@@ -219,9 +216,16 @@ const clearNTAs = () => {
     layer.resetStyle()
   })
 
-  d3.select("#charts-container").selectAll("svg, h5").remove()
+  // Clear polygon selector layer
+  drawnItems.clearLayers()
+  // Remove charts from empty container and display text
+  d3.selectAll("#charts-blank, #pie-blank").classed("d-block", true)
+  d3.selectAll("#charts-container, #pie-container")
+    .selectAll("svg, h5, p")
+    .remove()
 }
 
+// Events applied to each sewershed
 const onEachSewershed = (feature, layer) => {
   const prop = "sewershed"
   layer.on({
@@ -235,6 +239,7 @@ const onEachSewershed = (feature, layer) => {
   })
 }
 
+// Events applied to each treatment plant
 const onEachTP = (feature, layer) => {
   const prop = "treatment_plant"
   layer.on({
@@ -248,6 +253,7 @@ const onEachTP = (feature, layer) => {
   })
 }
 
+// Events applied to each sewer type area
 const onEachSewerArea = (feature, layer) => {
   const prop = "sewer_type"
   layer.on({
@@ -261,57 +267,6 @@ const onEachSewerArea = (feature, layer) => {
   })
 }
 
-const getChoroColorCSA = prop => {
-  let color
-  color =
-    prop > 0.948
-      ? "#440154"
-      : prop > 0.861
-      ? "#443a83"
-      : prop > 0.738
-      ? "#31688e"
-      : prop > 0.554
-      ? "#20908d"
-      : prop > 0.273
-      ? "#35b779"
-      : prop > 0.072
-      ? "#8fd744"
-      : "#fde725"
-  return color
-}
-
-const getChoroColorImperv = prop => {
-  let color
-  color =
-    prop > 0.829
-      ? "#d7191c"
-      : prop > 0.756
-      ? "#f17c4a"
-      : prop > 0.67
-      ? "#fec980"
-      : prop > 0.581
-      ? "#ffffbf"
-      : prop > 0.487
-      ? "#c7e9ad"
-      : prop > 0.368
-      ? "#80bfac"
-      : "#2b83ba"
-  return color
-}
-
-const getSewerColor = prop => {
-  let color
-  color =
-    prop === "SEPARATE"
-      ? "#7189bf"
-      : prop === "COMBINED"
-      ? "#df7599"
-      : prop === "DIRECT DRAINAGE"
-      ? "#ffc785"
-      : "#72d6c9"
-  return color
-}
-
 // Function to capitalize the first letter of each word in a string
 const capitalize = s => {
   s = s.toLowerCase()
@@ -321,6 +276,8 @@ const capitalize = s => {
     .join(" ")
 }
 
+// Renaming the NTA property key names to be more descriptive
+// Convert the values to more be more presentable
 const renameProperty = (prop, value) => {
   let area1, area2
   // Rename the variable names to provide clearer information
@@ -442,28 +399,27 @@ const getSewerType = sewer => {
   }
 }
 
-const concatGeoJSON = (g1, g2) => {
-  return {
-    type: "FeatureCollection",
-    features: [...g1.features, ...g2.features]
-  }
-}
+//
+const selectMultiple = layer => {
+  let drawnGJSON = layer.toGeoJSON()
 
-const getSelection = (drawnLayer, selectLayer) => {
-  let drawnGJSON = drawnLayer.toGeoJSON()
+  // Delete previous selector and selected polygons
+  clearNTAs()
+  // Display selector polygon
+  drawnItems.addLayer(layer)
 
   // Drawn circles are point geometries, convert to polygons
   if (turf.getType(drawnGJSON) === "Point") {
-    const radius = drawnLayer._mRadius / 1000
+    const radius = layer._mRadius / 1000
     const center = drawnGJSON.geometry.coordinates
     drawnGJSON = turf.circle(center, radius, { units: "kilometers" })
   }
 
   // Select all the polygons fully within the drawn shape
-  selectLayer.eachLayer(layer => {
+  ntaCSA.eachLayer(polygon => {
     // MultiPolygons need to be converted to a FeatureCollection
-    layer = turf.flatten(layer.toGeoJSON())
-    const features = layer.features
+    polygon = turf.flatten(polygon.toGeoJSON())
+    const features = polygon.features
     const len = features.length
     let counter = 0
     for (let i = 0; i < len; i++) {
@@ -480,18 +436,10 @@ const getSelection = (drawnLayer, selectLayer) => {
 
   // Zoom to all selected polygons
   if (selectedLayerGroup.getLayers().length) {
-    zoomToSelection(selectedLayerGroup.getBounds(), [90, 90])
+    zoomToBounds(selectedLayerGroup.getBounds(), [90, 90])
   }
 
   return gidArray
-}
-
-const selectMultiple = layer => {
-  drawnItems.clearLayers()
-  clearNTAs()
-
-  drawnItems.addLayer(layer)
-  return getSelection(layer, ntaCSA)
 }
 
 // Create an array of property objects for all the selected polygons
@@ -548,25 +496,37 @@ const combineProperties = arr => {
   displayAttributes(attrObj)
 }
 
+// Create a horizontal bar chart by desired NTA property
 const createChart = (attrObj, property) => {
-  const data = attrObj.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
+  // Sort the data by NTA code
+  // const data = attrObj.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
+  const data = attrObj.slice().sort((a, b) => d3.ascending(a.geoid, b.geoid))
+  // Percentage properties are converted from decimals to percents
   const dataFormat = property.includes("pct") ? ".1%" : ",.2r"
 
+  // Hide the text that's displayed when no polygons are selected
   d3.select("#charts-container #charts-blank")
     .classed("d-none", true)
     .classed("d-block", false)
 
-  d3.select("#charts-container").select(`#${property}-title`).remove()
-  d3.select("#charts-container").select(`#${property}`).remove()
+  // If a chart with the property has already been created, delete it
+  d3.select("#charts-container")
+    .select(`#${property.replace(/_/, "-")}-title`)
+    .remove()
+  d3.select("#charts-container")
+    .select(`#${property.replace(/_/, "-")}-chart`)
+    .remove()
 
+  // Add a title to the chart
   const title = renameProperty(property, data[0][property])[0]
   $("#charts-container").append(
     $("<h5>")
-      .attr("id", `${property}-title`)
+      .attr("id", `${property.replace(/_/, "-")}-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
       .text(title)
   )
 
+  // Define chart properties
   const margin = { top: 0, right: 13, bottom: 30, left: 40 }
   const barHeight = 15
   const height =
@@ -605,14 +565,16 @@ const createChart = (attrObj, property) => {
           .tickSizeOuter(0)
       )
 
+  // Create the svg element that other html elements will fit in
   const svg = d3
     .select("#charts-container")
     .append("svg")
-    .attr("id", property)
+    .attr("id", `${property.replace(/_/, "-")}-chart`)
     .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [0, 0, width, height])
 
-  const bar = svg
+  // Add the bars
+  svg
     .append("g")
     .classed("svg-bars", true)
     .attr("fill", "#5175b0")
@@ -629,6 +591,7 @@ const createChart = (attrObj, property) => {
     .append("svg:title")
     .text(d => d.neighborhood)
 
+  // Add text to each bar
   svg
     .append("g")
     .classed("svg-bar-text", true)
@@ -657,9 +620,11 @@ const createChart = (attrObj, property) => {
     .append("svg:title")
     .text(d => d.neighborhood)
 
+  // Add the axes and axis labels
   svg.append("g").call(xAxis)
   svg.append("g").call(yAxis)
 
+  // Add mouse events to the y-axis's labels
   svg
     .selectAll(".y-axis .tick")
     .data(data)
@@ -672,17 +637,23 @@ const createChart = (attrObj, property) => {
   return svg
 }
 
+// Highlight polygons and bar chart bars on event
 const highlightSelected = (e, d) => {
+  // Highlight bar chart bars and tick labels
   d3.selectAll(".svg-bars")
     .selectAll(`[geoid=${d.geoid}]`)
     .attr("fill", "#508a62")
-
   d3.selectAll(".tick")
     .select("text")
     .filter(function () {
       return d3.select(this).text() === d.geoid
     })
     .attr("fill", "#7eba49")
+
+  // Highlight pie chart arcs
+  d3.selectAll(".svg-arcs")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("stroke", "black")
 
   selectedLayerGroup.eachLayer(layer => {
     if (myMap.hasLayer(layer) && layer.feature.properties.geoid === d.geoid) {
@@ -691,6 +662,7 @@ const highlightSelected = (e, d) => {
   })
 }
 
+// Unhighlight polygons and bar chart bars on event
 const unhighlightSelected = (e, d) => {
   d3.selectAll(".svg-bars")
     .selectAll(`[geoid=${d.geoid}]`)
@@ -703,5 +675,264 @@ const unhighlightSelected = (e, d) => {
     })
     .attr("fill", "black")
 
+  // Highlight pie chart arcs
+  d3.selectAll(".svg-arcs")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("stroke", "white")
+
   selectedLayerGroup.setStyle(myStyle.selected)
+}
+
+// Create pie chart
+const createPies = attrArray => {
+  // Sort the data by NTA code
+  const data = attrArray.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
+
+  const margin = 10
+  const height = (width =
+    $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
+      : $(window).width() - 40)
+  const radius = Math.min(width - margin * 2, height - margin * 2) / 2
+
+  const color = d3
+    .scaleOrdinal()
+    .domain(data.map(d => d.name))
+    .range(["maroon", "olivedrab"])
+  const pervData = [
+    {
+      name: "pervious_pct",
+      value: d3.sum(data, d => d["pervious_pct"] * d.area),
+      dataset: data
+    },
+    {
+      name: "impervious_pct",
+      value: d3.sum(data, d => d["impervious_pct"] * d.area),
+      dataset: data
+    }
+  ]
+
+  const pie = d3.pie().value(d => d.value)
+  const arc = d3.arc().innerRadius(0).outerRadius(radius)
+  const arcs = pie(pervData)
+  const arcLabel = d3
+    .arc()
+    .innerRadius(radius * 0.6)
+    .outerRadius(radius * 0.6)
+
+  // Hide the text that's displayed when no polygons are selected
+  d3.select("#pie-container #pie-blank")
+    .classed("d-none", true)
+    .classed("d-block", false)
+  d3.select("#pie-container").selectAll("svg, h5, p").remove()
+
+  $("#pie-container").append(
+    $("<h5>")
+      .attr("id", `ratio-title`)
+      .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
+      .text("Pervious vs Impervious Land Area for Selected NTAs")
+  )
+
+  const svg = d3
+    .select("#pie-container")
+    .append("svg")
+    .classed("perv-pie", true)
+    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("viewBox", [-width / 2, -height / 2, width, height])
+
+  svg
+    .append("g")
+    .attr("stroke", "white")
+    .attr("stroke-width", 5)
+    .selectAll("path")
+    .data(arcs)
+    .join("path")
+    .attr("prop", d => d.data.name)
+    .attr("d", arc)
+    .on("mouseover", (e, d) => {
+      d3.select(e.target).attr("opacity", 0.7)
+      d3.select(e.target).style("cursor", "pointer")
+    })
+    .on("mouseout", (e, d) => {
+      d3.select(e.target).attr("opacity", 1)
+      d3.select(e.target).style("cursor", "pointer")
+    })
+    .on("click", drillDown)
+    .attr("fill", d => color(d.data.name))
+    .append("svg:title")
+    .text(d => capitalize(d.data.name.split("_")[0]))
+
+  svg
+    .append("g")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "1.2em")
+    .attr("text-anchor", "middle")
+    .selectAll("text")
+    .data(arcs)
+    .join("text")
+    .on("mouseover", (e, d) => {
+      d3.select(".perv-pie")
+        .selectAll(`[prop=${d.data.name}]`)
+        .attr("opacity", 0.7)
+      d3.select(e.target).style("cursor", "pointer")
+    })
+    .on("mouseout", (e, d) => {
+      d3.select(".perv-pie")
+        .selectAll(`[prop=${d.data.name}]`)
+        .attr("opacity", 1)
+      d3.select(e.target).style("cursor", "pointer")
+    })
+    .on("click", drillDown)
+    .attr("fill", "white")
+    .attr("transform", d => `translate(${arcLabel.centroid(d)})`)
+    .call(text =>
+      text
+        .append("tspan")
+        .attr("y", "-0.4em")
+        .attr("font-weight", "bold")
+        .text(d => capitalize(d.data.name.split("_")[0]))
+    )
+    .call(text =>
+      text
+        .filter(d => d.endAngle - d.startAngle > 0.25)
+        .append("tspan")
+        .attr("x", 0)
+        .attr("y", "0.8em")
+        .attr("fill-opacity", 0.8)
+        .text(
+          d =>
+            (d.data.value / 43560.0).toFixed(2).toLocaleString("en") + " acres"
+        )
+    )
+
+  $("#pie-container").append(
+    $("<p>")
+      .attr("id", `ratio-title`)
+      .addClass(["text-wrap", "text-center", "p-0", "m-0"])
+      .text("Select an arc to drill down and reveal additional data.")
+  )
+}
+
+const drillDown = (e, d) => {
+  const data = d.data.dataset
+  const value = d.data.name
+
+  const margin = 10
+  const height = (width =
+    $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
+      : $(window).width() - 40)
+  const radius = Math.min(width - margin * 2, height - margin * 2) / 2
+
+  const color =
+    value === "impervious_pct"
+      ? d3
+          .scaleSequential()
+          .domain([0, data.length])
+          .interpolator(d3.interpolateSpectral)
+      : d3
+          .scaleSequential()
+          .domain([data.length, 0])
+          .interpolator(d3.interpolateSpectral)
+
+  const pie = d3.pie().value(d => d[value])
+  const arc = d3
+    .arc()
+    .innerRadius(radius - width / 8)
+    .outerRadius(radius)
+    .padAngle(d => 1)
+    .padRadius(2)
+    .cornerRadius(5)
+  const arcs = pie(data)
+  const arcLabel = d3
+    .arc()
+    .innerRadius(radius * 0.87)
+    .outerRadius(radius * 0.87)
+
+  d3.select("#pie-container").selectAll("svg, h5, p").remove()
+
+  $("#pie-container").append(
+    $("<h5>")
+      .attr("id", `ratio-title`)
+      .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
+      .text(
+        `Percent Area of ${d3.select(e.target).text()} Land for Selected NTAs`
+      )
+  )
+
+  const svg = d3
+    .select("#pie-container")
+    .append("svg")
+    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("viewBox", [-width / 2, -height / 2, width, height])
+
+  svg
+    .append("g")
+    .classed("svg-arcs", true)
+    .attr("stroke", "white")
+    .selectAll("path")
+    .data(arcs)
+    .join("path")
+    .on("mouseover", (e, d) => highlightSelected(null, d.data))
+    .on("mouseout", (e, d) => unhighlightSelected(null, d.data))
+    .attr("geoid", d => d.data.geoid)
+    .attr("d", arc)
+    .attr("fill", d => color(d.index))
+    .append("svg:title")
+    .text(d => d.data.neighborhood)
+
+  svg
+    .append("g")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "0.8em")
+    .classed("shadow-stroke", true)
+    .selectAll("text")
+    .data(arcs)
+    .join("text")
+    .on("mouseover", (e, d) => highlightSelected(null, d.data))
+    .on("mouseout", (e, d) => unhighlightSelected(null, d.data))
+    .attr("transform", function (d) {
+      const midAngle =
+        d.endAngle < Math.PI
+          ? d.startAngle / 2 + d.endAngle / 2
+          : d.startAngle / 2 + d.endAngle / 2 + Math.PI
+      return (
+        "translate(" +
+        arcLabel.centroid(d)[0] +
+        "," +
+        arcLabel.centroid(d)[1] +
+        ") rotate(-90) rotate(" +
+        (midAngle * 180) / Math.PI +
+        ")"
+      )
+    })
+    .attr("dy", ".35em")
+    .attr("text-anchor", "middle")
+    .text(d => data.length < 40 ? d3.format(".1%")(d.data[value]) : null)
+    .append("svg:title")
+    .text(d => d.data.neighborhood)
+
+  const circle = d3.select("#pie-container svg").append("g")
+
+  circle
+    .append("circle")
+    .on("mouseover", e => {
+      d3.select(e.target).attr("opacity", 0.7)
+      d3.select(e.target).style("cursor", "pointer")
+    })
+    .on("mouseout", e => {
+      d3.select(e.target).attr("opacity", 1)
+    })
+    .on("click", () => createPies(data))
+    .attr("cx", 0)
+    .attr("cy", 0)
+    .attr("r", radius - width / 6)
+    .attr("fill", value === "pervious_pct" ? "olivedrab" : "maroon")
+
+  $("#pie-container").append(
+    $("<p>")
+      .attr("id", `ratio-title`)
+      .addClass(["text-wrap", "text-center", "p-0", "m-0"])
+      .text("Click center circle to go back up.")
+  )
 }
