@@ -14,7 +14,8 @@ const mbLight = L.tileLayer(mapboxURL, {
   maxZoom: 18,
   zoomOffset: -1,
   attribution: mapboxAttribution,
-  accessToken: accessToken
+  accessToken: process.env.mapbox_token
+  // accessToken: accessToken
 })
 
 const mbStreets = L.tileLayer(mapboxURL, {
