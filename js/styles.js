@@ -11,18 +11,20 @@ const myStyle = {
     fillOpacity: 0.6
   },
   selected: {
-    // color: "#61264f",
-    // fillColor: "#ff40c6",
+    color: "white",
+    weight: 2,
     color: "#53ad5c",
     fillColor: "#4aff5c",
     opacity: 0.6,
     fillOpacity: 0.6
   },
   highlight: {
+    weight: 2,
     color: "#8cc3d1",
     fillColor: "#abeeff"
   },
   selectAndHighlight: {
+    weight: 2,
     color: "#93b068",
     fillColor: "#d2ff8f"
   },

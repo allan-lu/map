@@ -129,6 +129,13 @@
                 ></a>
               </li>
             </ul>
+            <ul role="tablist">
+              <li>
+                <a href="#info" role="tab"
+                  ><i class="far fa-question-circle pl-1"></i
+                ></a>
+              </li>
+            </ul>
           </div>
           <div class="leaflet-sidebar-content">
             <div id="intro" class="leaflet-sidebar-pane">
@@ -189,7 +196,7 @@
               <div id="charts-container" class="leaflet-sidebar-inner">
                 <h6 id="charts-blank" class="p-2">
                   Use the polygon selector tools to view charts comparing data
-                  between neighborhoods.
+                  between selected neighborhoods.
                 </h6>
               </div>
             </div>
@@ -202,8 +209,50 @@
               </h1>
               <div id="pie-container" class="leaflet-sidebar-inner">
                 <h6 id="pie-blank" class="p-2">
-                  Select a polygon or use the polygon selector tools to view a 
-                  pie chart comparing their pervious area property.
+                  Use the polygon selector tools to view a 
+                  pie chart comparing their pervious land area.
+                </h6>
+              </div>
+            </div>
+            <div id="info" class="leaflet-sidebar-pane">
+              <h1 class="leaflet-sidebar-header">
+                Information & Contacts
+                <div class="leaflet-sidebar-close">
+                  <i class="fa fa-caret-right"></i>
+                </div>
+              </h1>
+              <div id="info-container" class="leaflet-sidebar-inner">
+                <h6 class="p-2">
+                  *Neighborhood selections are actually
+                  <a
+                    href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    class="text-info"
+                  >
+                    neighborhood tabulation areas</a
+                  >.
+                </h6>
+                <h6 class="p-2">
+                  This web map was created in JavaScript Node.js using Leaflet 
+                  and D3. The datasets were gathered from various city agencies 
+                  and compiled in PostgreSQL.
+                </h6>
+                <h6 class="p-2">
+                  For more information about this
+                  application or the data, contact the webpage creator
+                  <a href="mailto: contact@allanlu.me?subject=NYC Sewer Map Feedback&body=Message">
+                    Allan Lu
+                  </a>
+                  or visit their GitHub at:
+                  <a
+                    href="https://github.com/allan-lu/map"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    class="text-info"
+                  >
+                  https://github.com/allan-lu</a
+                  >.
                 </h6>
               </div>
             </div>
@@ -212,17 +261,6 @@
       </div>
       <div class="footer row bg-light justify-content-between">
         <div class="px-2">
-          <p class="m-0">
-            *Neighborhood selections are actually
-            <a
-              href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
-              target="_blank"
-              rel="noreferrer noopener"
-              class="text-info"
-            >
-              neighborhood tabulation areas</a
-            >. Dataset was compiled in PostgresSQL.
-          </p>
           <p id="sources" class="m-0">
             Data Sources: NYC Departments of
             <a
@@ -256,9 +294,6 @@
               >Open Sewer Atlas NYC</a
             >
           </p>
-        </div>
-        <div class="px-2 bg-light d-flex align-items-end">
-          <p class="m-0">Author: Allan Lu</p>
         </div>
       </div>
     </div>

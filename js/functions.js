@@ -109,6 +109,7 @@ const movePopup = e => {
 const highlightFeature = e => {
   const target = e.target
   const gid = target.feature.properties.gid
+  const geoid = target.feature.properties.geoid
   if (gidArray.includes(gid)) {
     // Highlight bar in bar chart
     highlightSelected(null, target.feature.properties)
@@ -121,8 +122,12 @@ const highlightFeature = e => {
 const resetToDefault = e => {
   const target = e.target
   const gid = target.feature.properties.gid
+  const geoid = target.feature.properties.geoid
   const stylePrev = target.defaultOptions.style(target.feature)
 
+  if (geoidArray.map(d => d.geoid).includes(geoid)) {
+    return
+  }
   if (gidArray.includes(gid)) {
     // Reset bar chart highlight
     unhighlightSelected(null, target.feature.properties)
@@ -583,7 +588,11 @@ const createChart = (attrObj, property) => {
     .join("rect")
     .attr("geoid", d => d.geoid)
     .on("mouseover", highlightSelected)
-    .on("mouseout", unhighlightSelected)
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.geoid))
+        unhighlightSelected(e, d)
+    })
+    .on("click", leaveHighlight)
     .attr("x", x(0))
     .attr("y", (d, i) => y(i))
     .attr("width", d => x(d[property]) - x(0))
@@ -603,7 +612,11 @@ const createChart = (attrObj, property) => {
     .data(data)
     .join("text")
     .on("mouseover", highlightSelected)
-    .on("mouseout", unhighlightSelected)
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.geoid))
+        unhighlightSelected(e, d)
+    })
+    .on("click", leaveHighlight)
     .attr("geoid", d => d.geoid)
     .attr("x", d => x(d[property]))
     .attr("y", (d, i) => y(i) + y.bandwidth() / 2)
@@ -629,7 +642,11 @@ const createChart = (attrObj, property) => {
     .selectAll(".y-axis .tick")
     .data(data)
     .on("mouseover", highlightSelected)
-    .on("mouseout", unhighlightSelected)
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.geoid))
+        unhighlightSelected(e, d)
+    })
+    .on("click", leaveHighlight)
     .attr("geoid", d => d.geoid)
     .append("svg:title")
     .text(d => d.neighborhood)
@@ -654,6 +671,7 @@ const highlightSelected = (e, d) => {
   d3.selectAll(".svg-arcs")
     .selectAll(`[geoid=${d.geoid}]`)
     .attr("stroke", "black")
+    .attr("stroke-width", 2)
 
   selectedLayerGroup.eachLayer(layer => {
     if (myMap.hasLayer(layer) && layer.feature.properties.geoid === d.geoid) {
@@ -680,7 +698,18 @@ const unhighlightSelected = (e, d) => {
     .selectAll(`[geoid=${d.geoid}]`)
     .attr("stroke", "white")
 
-  selectedLayerGroup.setStyle(myStyle.selected)
+  selectedLayerGroup.eachLayer(layer => {
+    if (layer.feature.properties.geoid === d.geoid) {
+      layer.setStyle(myStyle.selected)
+    }
+  })
+}
+
+const leaveHighlight = (e, d) => {
+  geoidArray.forEach(e => unhighlightSelected(null, e))
+  geoidArray.length = 0
+  highlightSelected(e, d)
+  geoidArray.push({ geoid: d.geoid })
 }
 
 // Create pie chart
@@ -736,7 +765,7 @@ const createPies = attrArray => {
   const svg = d3
     .select("#pie-container")
     .append("svg")
-    .classed("perv-pie", true)
+    .attr("id", "perv-pie")
     .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
 
@@ -771,13 +800,13 @@ const createPies = attrArray => {
     .data(arcs)
     .join("text")
     .on("mouseover", (e, d) => {
-      d3.select(".perv-pie")
+      d3.select("#perv-pie")
         .selectAll(`[prop=${d.data.name}]`)
         .attr("opacity", 0.7)
       d3.select(e.target).style("cursor", "pointer")
     })
     .on("mouseout", (e, d) => {
-      d3.select(".perv-pie")
+      d3.select("#perv-pie")
         .selectAll(`[prop=${d.data.name}]`)
         .attr("opacity", 1)
       d3.select(e.target).style("cursor", "pointer")
@@ -808,6 +837,7 @@ const createPies = attrArray => {
   $("#pie-container").append(
     $("<p>")
       .attr("id", `ratio-title`)
+      .css("font-size", "1.3em")
       .addClass(["text-wrap", "text-center", "p-0", "m-0"])
       .text("Select an arc to drill down and reveal additional data.")
   )
@@ -874,10 +904,20 @@ const drillDown = (e, d) => {
     .data(arcs)
     .join("path")
     .on("mouseover", (e, d) => highlightSelected(null, d.data))
-    .on("mouseout", (e, d) => unhighlightSelected(null, d.data))
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.data.geoid))
+        unhighlightSelected(null, d.data)
+    })
+    .on("click", (e, d) => leaveHighlight(null, d.data))
     .attr("geoid", d => d.data.geoid)
     .attr("d", arc)
     .attr("fill", d => color(d.index))
+    .attr("stroke", d => {
+      if (geoidArray.map(d => d.geoid).includes(d.data.geoid)) return "black"
+    })
+    .attr("stroke-width", d => {
+      if (geoidArray.map(d => d.geoid).includes(d.data.geoid)) return 2
+    })
     .append("svg:title")
     .text(d => d.data.neighborhood)
 
@@ -890,7 +930,11 @@ const drillDown = (e, d) => {
     .data(arcs)
     .join("text")
     .on("mouseover", (e, d) => highlightSelected(null, d.data))
-    .on("mouseout", (e, d) => unhighlightSelected(null, d.data))
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.data.geoid))
+        unhighlightSelected(null, d.data)
+    })
+    .on("click", (e, d) => leaveHighlight(null, d.data))
     .attr("transform", function (d) {
       const midAngle =
         d.endAngle < Math.PI
@@ -908,7 +952,7 @@ const drillDown = (e, d) => {
     })
     .attr("dy", ".35em")
     .attr("text-anchor", "middle")
-    .text(d => data.length < 40 ? d3.format(".1%")(d.data[value]) : null)
+    .text(d => (data.length < 40 ? d3.format(".1%")(d.data[value]) : null))
     .append("svg:title")
     .text(d => d.data.neighborhood)
 
@@ -920,19 +964,25 @@ const drillDown = (e, d) => {
       d3.select(e.target).attr("opacity", 0.7)
       d3.select(e.target).style("cursor", "pointer")
     })
-    .on("mouseout", e => {
-      d3.select(e.target).attr("opacity", 1)
-    })
-    .on("click", () => createPies(data))
+    .on("mouseout", e => d3.select(e.target).attr("opacity", 1))
+    .on("click", e => createPies(data))
     .attr("cx", 0)
     .attr("cy", 0)
     .attr("r", radius - width / 6)
     .attr("fill", value === "pervious_pct" ? "olivedrab" : "maroon")
 
-  $("#pie-container").append(
-    $("<p>")
-      .attr("id", `ratio-title`)
-      .addClass(["text-wrap", "text-center", "p-0", "m-0"])
-      .text("Click center circle to go back up.")
-  )
+  $("#pie-container")
+    .append(
+      $("<p>")
+        .attr("id", `ratio-title`)
+        .css("font-size", "1.3em")
+        .addClass(["text-wrap", "text-center", "p-0", "m-0"])
+        .text("Click center circle to go back up.")
+    )
+    .append(
+      $("<p>")
+        .attr("id", `ratio-title`)
+        .addClass(["text-wrap", "text-center", "p-0", "m-0"])
+        .text("For percentage labels to show, select less than 40 NTAs.")
+    )
 }

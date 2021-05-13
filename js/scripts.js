@@ -4,7 +4,8 @@ const mapboxAttribution =
   'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
 const mediaQuery = window.matchMedia("(min-width: 768px)")
 const gidArray = []
-const selectedLayerGroup = L.featureGroup({ pane: "polygonsPane" })
+const geoidArray = []
+const selectedLayerGroup = L.featureGroup({ pane: "pointsPane" })
 
 // INITIALIZING LAYERS //
 // BASE LAYERS //
@@ -183,26 +184,24 @@ legend.onAdd = map => {
   if (map.hasLayer(ntaCSA)) {
     grades = [0, 0.072, 0.273, 0.554, 0.739, 0.861, 0.948]
     colorFunc = myStyle.getChoroColorCSA
-    title = "Percent of Combined <br> Sewer Areas"
-    
-    } else {
+    title =
+      '<h6 class="font-weight-bold">Percent of Combined <br> Sewer Areas</h6>'
+  } else {
     grades = [0, 0.368, 0.487, 0.581, 0.67, 0.756, 0.829]
     colorFunc = myStyle.getChoroColorImperv
-    title = "Percent of <br> Impervious Land"
+    title = '<h6 class="font-weight-bold">Percent of <br> Impervious Land</h6>'
   }
 
-  let labels = [title]
+  let html = [title]
+  let labels = []
   for (let i = 0; i < grades.length; i++) {
     labels.push(
-      '<i style="background:' +
-      colorFunc(grades[i] + 0.01) +
-      '"></i> ' +
-      grades[i] +
-      (grades[i + 1]
-        ? "&ndash;" + (grades[i + 1] - 0.001)
-        : "&ndash;1"))
+      `<i style="background: ${colorFunc(grades[i] + 0.01)}"></i>${(grades[i] * 100).toFixed(1)}%` +
+        (grades[i + 1] ? "&ndash;" + ((grades[i + 1] - 0.001) * 100).toFixed(1) + "%" : "&ndash;100%")
+    )
   }
-  div.innerHTML = labels.join("<br>")
+  html.push(labels.join("<br>"))
+  div.innerHTML = html.join("")
   return div
 }
 legend.addTo(myMap)
