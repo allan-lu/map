@@ -983,6 +983,6 @@ const drillDown = (e, d) => {
       $("<p>")
         .attr("id", `ratio-title`)
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
-        .text("For percentage labels to show, select less than 40 NTAs.")
+        .text("For percentage labels to show, select fewer than 40 NTAs.")
     )
 }
