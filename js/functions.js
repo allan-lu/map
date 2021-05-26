@@ -680,7 +680,7 @@ const highlightSelected = (e, d) => {
     .attr("stroke-width", 2)
 
   selectedLayerGroup.eachLayer(layer => {
-    if (myMap.hasLayer(layer) && layer.feature.properties.geoid === d.geoid) {
+    if (layer.feature.properties.geoid === d.geoid) {
       layer.setStyle(myStyle.selectAndHighlight)
     }
   })
@@ -724,17 +724,19 @@ const createPies = attrArray => {
   // Sort the data by NTA code
   const data = attrArray.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
 
+  // Variables that determine chart area
   const margin = 10
   const height = (width =
     $(window).width() > 768
       ? $(".leaflet-sidebar-pane").width()
       : $(window).width() - 40)
   const radius = Math.min(width - margin * 2, height - margin * 2) / 2
-
+  // Pie chart colors
   const color = d3
     .scaleOrdinal()
     .domain(data.map(d => d.name))
     .range(["maroon", "olivedrab"])
+  // Pervious land area data object
   const pervData = [
     {
       name: "pervious_pct",
@@ -748,6 +750,7 @@ const createPies = attrArray => {
     }
   ]
 
+  // Create functions for pie chart and labels
   const pie = d3.pie().value(d => d.value)
   const arc = d3.arc().innerRadius(0).outerRadius(radius)
   const arcs = pie(pervData)
@@ -762,6 +765,7 @@ const createPies = attrArray => {
     .classed("d-block", false)
   d3.select("#pie-container").selectAll("svg, h5, p").remove()
 
+  // Pie chart title
   $("#pie-container").append(
     $("<h5>")
       .attr("id", `ratio-title`)
@@ -769,6 +773,7 @@ const createPies = attrArray => {
       .text("Pervious vs Impervious Land Area for Selected NTAs")
   )
 
+  // Pie chart container
   const svg = d3
     .select("#pie-container")
     .append("svg")
@@ -776,6 +781,7 @@ const createPies = attrArray => {
     .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
 
+  // Add pie chart
   svg
     .append("g")
     .attr("stroke", "white")
@@ -798,6 +804,7 @@ const createPies = attrArray => {
     .append("svg:title")
     .text(d => capitalize(d.data.name.split("_")[0]))
 
+  // Add text/labels
   svg
     .append("g")
     .attr("font-family", "sans-serif")
@@ -821,6 +828,7 @@ const createPies = attrArray => {
     .on("click", drillDown)
     .attr("fill", "white")
     .attr("transform", d => `translate(${arcLabel.centroid(d)})`)
+    // Pervious/impervious label
     .call(text =>
       text
         .append("tspan")
@@ -830,6 +838,7 @@ const createPies = attrArray => {
         .append("svg:title")
         .text(d => capitalize(d.data.name.split("_")[0]))
     )
+    // Acreage label
     .call(text =>
       text
         .filter(d => d.endAngle - d.startAngle > 0.25)
@@ -845,6 +854,7 @@ const createPies = attrArray => {
         .text(d => capitalize(d.data.name.split("_")[0]))
     )
 
+  // Instructory text
   $("#pie-container").append(
     $("<p>")
       .attr("id", `ratio-title`)
@@ -854,6 +864,7 @@ const createPies = attrArray => {
   )
 }
 
+// Drill down function when clicking on pie chart sector
 const drillDown = (e, d) => {
   const data = d.data.dataset
   const value = d.data.name
@@ -865,6 +876,7 @@ const drillDown = (e, d) => {
       : $(window).width() - 40)
   const radius = Math.min(width - margin * 2, height - margin * 2) / 2
 
+  // Spectral pie chart sector coloring
   const color =
     value === "impervious_pct"
       ? d3
@@ -879,6 +891,7 @@ const drillDown = (e, d) => {
   const pie = d3.pie().value(d => d[value])
   const arc = d3
     .arc()
+    // Inner radius value creates a donut pie chart
     .innerRadius(radius - width / 8)
     .outerRadius(radius)
     .padAngle(d => 1)
@@ -890,6 +903,7 @@ const drillDown = (e, d) => {
     .innerRadius(radius * 0.87)
     .outerRadius(radius * 0.87)
 
+  // Clear pie chart pane before adding new svgs
   d3.select("#pie-container").selectAll("svg, h5, p").remove()
 
   $("#pie-container").append(
@@ -907,6 +921,7 @@ const drillDown = (e, d) => {
     .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
 
+  // Donut pie chart
   svg
     .append("g")
     .classed("svg-arcs", true)
@@ -932,6 +947,7 @@ const drillDown = (e, d) => {
     .append("svg:title")
     .text(d => d.data.neighborhood)
 
+  // Pie chart Labels
   svg
     .append("g")
     .attr("font-family", "sans-serif")
@@ -967,6 +983,7 @@ const drillDown = (e, d) => {
     .append("svg:title")
     .text(d => d.data.neighborhood)
 
+  // Add a circle in the center that represents selected pie chart sector
   const circle = d3.select("#pie-container svg").append("g")
 
   circle
@@ -982,6 +999,7 @@ const drillDown = (e, d) => {
     .attr("r", radius - width / 6)
     .attr("fill", value === "pervious_pct" ? "olivedrab" : "maroon")
 
+  // Instructory text
   $("#pie-container")
     .append(
       $("<p>")

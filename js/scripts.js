@@ -470,16 +470,6 @@ myMap.on({
   overlayadd: layer => {
     // Add corresponding legend
     myMap.addControl(legend)
-
-    // Retain highlighted polygon if multiple polygons are selected
-    if (layer.group.name === "Neighborhoods") {
-      layer.layer.eachLayer(i => {
-        const geoid = i.feature.properties.geoid
-        if (geoidArray.map(d => d.geoid).includes(geoid)) {
-          i.setStyle(myStyle.selectAndHighlight)
-        }
-      })
-    }
   },
   // While drawing the selector polygon, prevent map layer events
   "draw:toolbaropened": () => {
