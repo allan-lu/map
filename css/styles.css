@@ -19,7 +19,9 @@ body {
 }
 
 #sources {
-  font-size: 0.8em;
+  list-style-position: inside;
+  padding-left: 0;
+  font-size: 1.2em;
 }
 
 /* Add halo effect to pie chart labels*/

@@ -75,6 +75,7 @@
     <script src="https://unpkg.com/@turf/turf@6.3.0/turf.min.js"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
   </head>
+
   <body>
     <div class="container-fluid d-flex flex-column vh-100 overflow-hidden">
       <div class="header bg-light">
@@ -120,12 +121,12 @@
               </li>
               <li title="Charts">
                 <a href="#charts" role="tab"
-                  ><i class="fa fa-chart-bar pl-1"></span></i
+                  ><i class="fa fa-chart-bar pl-1"></i
                 ></a>
               </li>
               <li title="Pie Charts">
                 <a href="#pies" role="tab"
-                  ><i class="fas fa-chart-pie pl-1"></span></i
+                  ><i class="fas fa-chart-pie pl-1"></i
                 ></a>
               </li>
             </ul>
@@ -165,7 +166,7 @@
                   rivers, or other bodies of water.
                   <br />
                   &emsp; In 2010, the city’s Department of Environmental
-                  Protection implemented the NYC Green Infrastructure (GI)
+                  Protection implemented the NYC Green Infrastructure
                   Program which uses manufactured landscapes to mimic natural
                   systems in managing stormwater runoff. Some examples include
                   rain gardens, stormwater greenstreets, green roofs and
@@ -173,7 +174,7 @@
                   <br />
                   &emsp; The purpose of this map is to provide a comprehensive
                   visualization of green infrastructure and sewer data at the
-                  neighborhood level. Its interactivity allows for the user to 
+                  neighborhood level. Its interactivity allows for the user to
                   select and compare attributes of multiple areas.
                 </h6>
               </div>
@@ -187,8 +188,8 @@
               </h1>
               <ul id="attr-list" class="leaflet-sidebar-inner list-group">
                 <h6 id="attr-blank" class="p-2">
-                  Select one neighborhood or multiple neighborhood polygons to view 
-                  their properties.
+                  Select one neighborhood or multiple neighborhood polygons to
+                  view their properties.
                 </h6>
               </ul>
             </div>
@@ -215,8 +216,9 @@
               </h1>
               <div id="pie-container" class="leaflet-sidebar-inner">
                 <h6 id="pie-blank" class="p-2">
-                  Select a polygon or use the polygon selector tools to view a pie chart 
-                  comparing the selected neighborhoods' pervious and impervious land areas.
+                  Select a polygon or use the polygon selector tools to view a
+                  pie chart comparing the selected neighborhoods' pervious and
+                  impervious land areas.
                 </h6>
               </div>
             </div>
@@ -229,9 +231,11 @@
               </h1>
               <div id="contact-container" class="leaflet-sidebar-inner">
                 <h6 class="p-2">
-                  For more information about this
-                  application or the data, contact the webpage creator
-                  <a href="mailto: contact@allanlu.me?subject=NYC Sewer Map Feedback&body=Message">
+                  For more information about this application or the data,
+                  contact the webpage creator
+                  <a
+                    href="mailto: contact@allanlu.me?subject=NYC Sewer Map Feedback&body=Message"
+                  >
                     Allan Lu
                   </a>
                   or visit their GitHub at:
@@ -241,7 +245,7 @@
                     rel="noreferrer noopener"
                     class="text-info"
                   >
-                  https://github.com/allan-lu</a
+                    https://github.com/allan-lu</a
                   >.
                 </h6>
               </div>
@@ -255,62 +259,120 @@
               </h1>
               <div id="info-container" class="leaflet-sidebar-inner">
                 <h6 class="p-2">
-                  *Neighborhood selections are actually
+                  Neighborhood polygons are actually
                   <a
                     href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
                     target="_blank"
                     rel="noreferrer noopener"
-                    class="text-info"
                   >
                     neighborhood tabulation areas</a
                   >.
                 </h6>
                 <h6 class="p-2">
-                  This web map was created in JavaScript Node.js with the jQuery, Leaflet, 
-                  Turf, and D3 packages. The datasets were gathered from various city agencies 
-                  and compiled using PostgreSQL.
+                  This web map was written in JavaScript Node.js with the
+                  <a
+                    href="https://jquery.com"
+                    target="_blank"
+                    rel="norefferer noopener"
+                    >jQuery</a
+                  >,
+                  <a
+                    href="https://leafletjs.com"
+                    target="_blank"
+                    rel="norefferer noopener"
+                  >
+                    Leaflet</a
+                  >,
+                  <a
+                    href="https://turfjs.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >Turf</a
+                  >, and
+                  <a
+                    href="https://d3js.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >D3</a
+                  >
+                  packages. Basemap imagery provided by
+                  <a
+                    href="https://www.mapbox.com"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >Mapbox</a
+                  >
+                  and
+                  <a
+                    href="https://www.openstreetmap.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >OpenStreetMap</a
+                  >
+                  contributors. The datasets were gathered from various city
+                  agencies and compiled using
+                  <a
+                    href="https://www.postgresql.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >PostgreSQL</a
+                  >.
                 </h6>
+                <h6 class="px-2 mb-0">Data Sources:</h6>
+                <ul id="sources" class="m-0 px-3">
+                  <li>
+                    <a
+                      href="https://openseweratlas.tumblr.com"
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      >Open Sewer Atlas NYC</a
+                    >
+                  </li>
+                  <li>
+                    NYC Departments of:
+                    <ul class="px-4">
+                      <li>
+                        <a
+                          href="https://www1.nyc.gov/site/planning/index.page"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ City Planning</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www1.nyc.gov/site/dep/index.page"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ Environmental Protection</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www1.nyc.gov/site/doitt/index.page"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ Information Technology & Telecommunications</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www.nycgovparks.org/"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ Parks & Recreation</a
+                        >
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="footer row bg-light justify-content-between">
-        <div class="px-2">
-          <p id="sources" class="m-0">
-            Data Sources: NYC Departments of
-            <a
-              href="https://www1.nyc.gov/site/planning/index.page"
-              target="_blank"
-              rel="noreferrer noopener"
-              >~ City Planning</a
-            >,
-            <a
-              href="https://www1.nyc.gov/site/dep/index.page"
-              target="_blank"
-              rel="noreferrer noopener"
-              >~ Environmental Protection</a
-            >,
-            <a
-              href="https://www1.nyc.gov/site/doitt/index.page"
-              target="_blank"
-              rel="noreferrer noopener"
-              >~ Information Technology & Telecommunications</a
-            >,
-            <a
-              href="https://www.nycgovparks.org/"
-              target="_blank"
-              rel="noreferrer noopener"
-              >~ Parks & Recreation</a
-            >, and
-            <a
-              href="https://openseweratlas.tumblr.com"
-              target="_blank"
-              rel="noreferrer noopener"
-              >Open Sewer Atlas NYC</a
-            >
-          </p>
-        </div>
+        <div class="px-2"></div>
       </div>
     </div>
   </body>

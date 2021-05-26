@@ -169,7 +169,8 @@ const myMap = L.map("mapid", {
   maxBounds: L.latLngBounds(L.latLng(40.43, -74.7), L.latLng(40.98, -73.1)),
   minZoom: 10,
   fullscreenControl: { pseudoFullscreen: true },
-  tap: false // remove touch screen problems?
+  attributionControl: false,
+  tap: false // remove touch screen problems
 })
 
 // Get bounds for default view
@@ -269,7 +270,10 @@ $.getJSON(
 
     for (const i in data.features) {
       const nta = data.features[i]
-      const neighborhood = nta.properties.neighborhood.split("-").sort().join("-")
+      const neighborhood = nta.properties.neighborhood
+        .split("-")
+        .sort()
+        .join("-")
 
       if (
         !["park-cemetery-etc", "Airport"].some(str =>
