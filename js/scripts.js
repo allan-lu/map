@@ -448,10 +448,10 @@ const drawOptions = {
 L.drawLocal.draw.toolbar.buttons.polygon = "Polygon select"
 L.drawLocal.draw.toolbar.buttons.rectangle = "Rectangle select"
 L.drawLocal.draw.toolbar.buttons.circle = "Circle select"
-L.drawLocal.edit.toolbar.buttons.edit = "Edit selector"
-L.drawLocal.edit.toolbar.buttons.editDisabled = "No selector to edit"
-L.drawLocal.edit.toolbar.buttons.remove = "Delete selector"
-L.drawLocal.edit.toolbar.buttons.removeDisabled = "No selector to delete"
+L.drawLocal.edit.toolbar.buttons.edit = "Edit selector polygon"
+L.drawLocal.edit.toolbar.buttons.editDisabled = "No selector polygon to edit"
+L.drawLocal.edit.toolbar.buttons.remove = "Delete selection"
+L.drawLocal.edit.toolbar.buttons.removeDisabled = "No selections to delete"
 
 // Remove options from delete drawn layers button
 L.EditToolbar.Delete.include({
@@ -486,37 +486,16 @@ myMap.on({
   // When a selector polygon is drawn:
   "draw:created": e => {
     const layer = e.layer
-    // Find which polygons were selected
-    const selectedFeatures = selectMultiple(layer)
-
-    // If no polygons selected end drawing
-    if (selectedFeatures.length === 0) {
-      return
-    }
-
-    // Create an attribute object of the selected polygons
-    const selectedAttr = createAttrObj(selectedFeatures)
-    // In the attributes sidebar tab, combine all the properties of the selected polygons
-    combineProperties(selectedAttr)
-
-    // Draw the bar & pie charts
-    createChart(selectedAttr, "gi_count")
-    createChart(selectedAttr, "csa_pct")
-    createPies(selectedAttr)
+    // Find which polygons were selected, and populate & style elements accordingly
+    selectMultiple(layer)
   },
   // When the selector polygon is edited, update the selected polygons & sidebar panes
   "draw:edited": e => {
     const layer = e.layers.getLayers()[0]
 
-    const selectedFeatures = selectMultiple(layer)
-    if (selectedFeatures.length === 0) {
-      return
-    }
-    const selectedAttr = createAttrObj(selectedFeatures)
-    combineProperties(selectedAttr)
-    createChart(selectedAttr, "gi_count")
-    createChart(selectedAttr, "csa_pct")
+    // If selector polygon was unchanged, perform no changes
+    if (layer === undefined) return
 
-    createPies(selectedAttr)
+    selectMultiple(layer)
   }
 })

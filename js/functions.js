@@ -29,7 +29,7 @@ const displayAttributes = property => {
             // Create header element
             $("<h6>").addClass(["m-1", "font-weight-bold"]).text(attribute),
             // Create paragraph element
-            $("<h6>").addClass(["mb-2 mr-0 pl-2"]).text(value)
+            $("<h6>").addClass(["mb-2 mr-0 pl-2 attr-value"]).text(value)
           )
       )
     }
@@ -109,11 +109,9 @@ const movePopup = e => {
 const highlightFeature = e => {
   const target = e.target
   const gid = target.feature.properties.gid
-  const geoid = target.feature.properties.geoid
+  // const geoid = target.feature.properties.geoid
 
-  if (geoidArray.map(d => d.geoid).includes(geoid)) {
-    highlightSelected(null, target.feature.properties)
-  } else if (gidArray.includes(gid)) {
+  if (gidArray.includes(gid)) {
     // Highlight bar in bar chart
     highlightSelected(null, target.feature.properties)
   } else {
@@ -143,7 +141,11 @@ const resetToDefault = e => {
 
 // Select and zoom to polygon(s)
 const selectAndZoom = (props, gid, bounds, pad) => {
-  if (gidArray.includes(gid)) {
+  // If multiple polygons are selected, selecting one within them
+  // will highlight information about that NTA across all elements
+  if (gidArray.length > 1 && gidArray.includes(gid)) {
+    leaveHighlight(null, props)
+  } else if (gidArray.includes(gid)) {
     // Selecting an already selected feature will unselect it on both the map
     // and the neighborhood list panel
     clearNTAs()
@@ -171,6 +173,11 @@ const selectAndZoom = (props, gid, bounds, pad) => {
     // Zoom to selected feature
     zoomToBounds(bounds, pad)
   }
+
+  // Change CSS of Leaflet Draw delete button to "enabled"
+  $(".leaflet-draw-edit-remove")
+    .removeClass("leaflet-disabled")
+    .prop("title", "Delete selection")
 }
 
 // Zoom to given bounds
@@ -193,9 +200,8 @@ const zoomToBounds = (bounds, pad = [0, 0]) => {
 
 // Actions performed when an NTA is selected
 const selectNTA = gid => {
-  // // Highlight and scroll to selected neighborhood on the left side
-  $(`#${gid}`).css("background-color", "rgba(126, 186, 73, 0.3)")
-  document.getElementById(`${gid}`).scrollIntoView({ block: "center" })
+  // Highlight and scroll to selected neighborhood on the left side
+  highlightLeftPanel(gid, "rgba(126, 186, 73, 0.3)")
 
   ntaLayerGroup.eachLayer(layer => {
     layer.eachLayer(i => {
@@ -210,6 +216,12 @@ const selectNTA = gid => {
   gidArray.push(gid)
 }
 
+// Highlight and scroll to selected neighborhood on the left side
+const highlightLeftPanel = (gid, color) => {
+  $(`#${gid}`).css("background-color", color)
+  document.getElementById(`${gid}`).scrollIntoView({ block: "center" })
+}
+
 // Clearing visual properties and removing selected NTAs from layer group and array
 const clearNTAs = () => {
   // Unselect element from left panel and clear attribute container
@@ -220,6 +232,7 @@ const clearNTAs = () => {
   // Clear selected layers
   selectedLayerGroup.clearLayers()
   gidArray.length = 0
+  geoidArray.length = 0
 
   // Reset all layer styles
   ntaLayerGroup.eachLayer(layer => {
@@ -228,11 +241,17 @@ const clearNTAs = () => {
 
   // Clear polygon selector layer
   drawnItems.clearLayers()
+
   // Remove charts from empty container and display text
   d3.selectAll("#charts-blank, #pie-blank").classed("d-block", true)
   d3.selectAll("#charts-container, #pie-container")
     .selectAll("svg, h5, p")
     .remove()
+
+  // Change CSS of Leaflet Draw delete button to "disabled"
+  $(".leaflet-draw-edit-remove")
+    .addClass("leaflet-disabled")
+    .prop("title", "No selections to delete")
 }
 
 // Events applied to each sewershed
@@ -409,9 +428,28 @@ const getSewerType = sewer => {
   }
 }
 
+// When a selector polygon is drawn, call the following functions
+const selectMultiple = layer => {
+  // Find which polygons were selected
+  const selectedFeatures = findWithin(layer)
+
+  // If no polygons selected end drawing
+  if (selectedFeatures.length === 0) return
+
+  // Create an attribute object of the selected polygons
+  const selectedAttr = createAttrObj(selectedFeatures)
+  // In the attributes sidebar tab, combine all the properties of the selected polygons
+  combineProperties(selectedAttr)
+
+  // Draw the bar & pie charts
+  createChart(selectedAttr, "gi_count")
+  createChart(selectedAttr, "csa_pct")
+  createPies(selectedAttr)
+}
+
 // Find which polygons were selected using Turf.js's booleanWithin function
 // Returns an array of the selected polygon's gid's
-const selectMultiple = layer => {
+const findWithin = layer => {
   let drawnGJSON = layer.toGeoJSON()
 
   // Delete previous selector and selected polygons
@@ -713,10 +751,37 @@ const unhighlightSelected = (e, d) => {
 
 // Makes the highlighted bar, sector and polygon stay highlighted
 const leaveHighlight = (e, d) => {
-  geoidArray.forEach(e => unhighlightSelected(null, e))
+  // Clear all the previously selected elements
+  geoidArray.forEach(e => {
+    unhighlightSelected(null, e)
+    highlightLeftPanel(e.gid, "rgba(126, 186, 73, 0.3)")
+  })
   geoidArray.length = 0
+  $("#attr-list li .attr-value span").remove()
+
+  // Highlight selected element across all charts, maps and panels
   highlightSelected(e, d)
-  geoidArray.push({ geoid: d.geoid })
+
+  // Append selected NTA properties to the attributes tab in the sidebar
+  $("#attr-list li").each((i, e) => {
+    const propName = $(e).attr("id").split(/-(.+)/)[1].replaceAll("-", "_")
+    d.borough = getBorough(d.geoid)
+    const [attribute, value] = renameProperty(propName, d[propName])
+
+    $(e)
+      .find(".attr-value")
+      .append(
+        $("<span>")
+          .addClass(["font-weight-bold", "text-success"])
+          .text(` [${value}]`)
+      )
+  })
+
+  // Scroll to and highlight the neighborhood name on the left panel
+  highlightLeftPanel(d.gid, "rgba(230, 255, 89, 0.3)")
+
+  // Keep track of the selected NTA
+  geoidArray.push({ geoid: d.geoid, gid: d.gid })
 }
 
 // Create pie chart
@@ -860,7 +925,7 @@ const createPies = attrArray => {
       .attr("id", `ratio-title`)
       .css("font-size", "1.3em")
       .addClass(["text-wrap", "text-center", "p-0", "m-0"])
-      .text("Select an arc to drill down and reveal additional data.")
+      .text("Select a sector to drill down and reveal additional data.")
   )
 }
 
@@ -911,7 +976,10 @@ const drillDown = (e, d) => {
       .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
       .text(
-        `Percent Area of ${d3.select(e.target).select("title").text()} Land for Selected NTAs`
+        `Percent Area of ${d3
+          .select(e.target)
+          .select("title")
+          .text()} Land for Selected NTAs`
       )
   )
 
