@@ -22,6 +22,7 @@ body {
   font-size: 0.8em;
 }
 
+/* Add halo effect to pie chart labels*/
 .shadow-stroke {
   text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
     1px 1px 0 #fff;
@@ -30,7 +31,6 @@ body {
 .panel {
   min-width: 200px;
   max-width: 300px;
-  /* padding: 0; */
 }
 
 .legend {
@@ -61,6 +61,7 @@ body {
   background-color: #7eba49 !important;
 }
 
+/* 64-77 Make the scroll bar in the sidebar sit below the header */
 .leaflet-sidebar-inner {
   position: absolute;
   top: 40px;
@@ -70,6 +71,7 @@ body {
   overflow: auto;
   width: 100%;
 }
+
 .leaflet-sidebar.collapsed > .leaflet-sidebar-inner {
   overflow: hidden;
 }
@@ -88,7 +90,13 @@ body {
   margin: 6px;
 }
 
-.unselectable {
+/* Prevent the highlighting of text */
+.unselectable,
+.leaflet-control-zoomhome,
+.leaflet-control-layers,
+.leaflet-sidebar-header,
+.leaflet-control-attribution,
+svg {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;

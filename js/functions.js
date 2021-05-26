@@ -553,10 +553,9 @@ const combineProperties = arr => {
 // Create a horizontal bar chart by desired NTA property
 const createChart = (attrObj, property) => {
   // Sort the data by NTA code
-  // const data = attrObj.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
   const data = attrObj.slice().sort((a, b) => d3.ascending(a.geoid, b.geoid))
   // Percentage properties are converted from decimals to percents
-  const dataFormat = property.includes("pct") ? ".1%" : ",.2r"
+  const dataFormat = property.includes("pct") ? ".1%" : ",~r"
 
   // Hide the text that's displayed when no polygons are selected
   d3.select("#charts-container #charts-blank")

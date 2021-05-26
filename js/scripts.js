@@ -179,7 +179,8 @@ const defaultBounds = myMap.getBounds()
 const legend = L.control({ position: "bottomleft" })
 legend.onAdd = map => {
   let grades, colorFunc, title
-  const div = L.DomUtil.create("div", "info legend")
+  const div = L.DomUtil.create("div", "info legend unselectable")
+  // $(".info .legend .leaflet-control").addClass("unselectable")
 
   if (map.hasLayer(ntaCSA)) {
     grades = [0, 0.072, 0.273, 0.554, 0.739, 0.861, 0.948]

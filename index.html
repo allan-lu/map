@@ -78,7 +78,7 @@
   <body>
     <div class="container-fluid d-flex flex-column vh-100 overflow-hidden">
       <div class="header bg-light">
-        <h1 class="text-center">New York City Sewer Data</h1>
+        <h1 class="text-center unselectable">New York City Sewer Data</h1>
       </div>
       <div id="middle-container" class="row d-flex flex-grow-1 overflow-hidden">
         <div
@@ -94,7 +94,7 @@
             overflow-hidden
           "
         >
-          <div id="nbhd-header" class="row bg-dark py-2">
+          <div id="nbhd-header" class="row bg-dark py-2 unselectable">
             <h4 class="col text-white text-center">Neighborhoods</h4>
           </div>
           <ul
@@ -103,7 +103,7 @@
           ></ul>
         </div>
         <div id="map-container" class="col">
-          <div id="mapid" class="unselectable"></div>
+          <div id="mapid"></div>
         </div>
         <div id="sidebar" class="leaflet-sidebar collapsed bg-white">
           <div class="leaflet-sidebar-tabs">
