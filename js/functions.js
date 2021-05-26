@@ -827,6 +827,8 @@ const createPies = attrArray => {
         .attr("y", "-0.4em")
         .attr("font-weight", "bold")
         .text(d => capitalize(d.data.name.split("_")[0]))
+        .append("svg:title")
+        .text(d => capitalize(d.data.name.split("_")[0]))
     )
     .call(text =>
       text
@@ -837,8 +839,10 @@ const createPies = attrArray => {
         .attr("fill-opacity", 0.8)
         .text(
           d =>
-            (d.data.value / 43560.0).toFixed(2).toLocaleString("en") + " acres"
+            (d.data.value / 43560.0).toFixed(0).toLocaleString("en") + " acres"
         )
+        .append("svg:title")
+        .text(d => capitalize(d.data.name.split("_")[0]))
     )
 
   $("#pie-container").append(
@@ -893,7 +897,7 @@ const drillDown = (e, d) => {
       .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
       .text(
-        `Percent Area of ${d3.select(e.target).text()} Land for Selected NTAs`
+        `Percent Area of ${d3.select(e.target).select("title").text()} Land for Selected NTAs`
       )
   )
 
