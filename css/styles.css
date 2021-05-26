@@ -105,7 +105,6 @@ svg {
 }
 
 @media only screen and (max-width: 768px) {
-  .footer,
   .panel {
     display: none !important;
   }

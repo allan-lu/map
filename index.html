@@ -4,6 +4,7 @@
     <title>New York City Sewer Data</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- CSS STYLESHEETS -->
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -53,9 +54,12 @@
       rel="stylesheet"
       href="node_modules/leaflet-draw/dist/leaflet.draw.css"
     />
+    <!-- JS SCRIPTS -->
+    <!-- User Scripts -->
     <script defer src="js/functions.js"></script>
     <script defer src="js/styles.js"></script>
     <script defer src="js/scripts.js"></script>
+    <!-- CDN and NPM Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -78,10 +82,12 @@
 
   <body>
     <div class="container-fluid d-flex flex-column vh-100 overflow-hidden">
+      <!-- HEADER -->
       <div class="header bg-light">
         <h1 class="text-center unselectable">New York City Sewer Data</h1>
       </div>
       <div id="middle-container" class="row d-flex flex-grow-1 overflow-hidden">
+        <!-- NEIGHBORHOOD PANEL -->
         <div
           id="nbhd-container"
           class="
@@ -103,10 +109,13 @@
             class="row list-group flex-nowrap overflow-auto"
           ></ul>
         </div>
+        <!-- LEAFLET MAP -->
         <div id="map-container" class="col">
           <div id="mapid"></div>
         </div>
+        <!-- LEAFLET SIDEBAR -->
         <div id="sidebar" class="leaflet-sidebar collapsed bg-white">
+          <!-- Sidebar Tabs -->
           <div class="leaflet-sidebar-tabs">
             <ul role="tablist">
               <li title="Introduction">
@@ -143,7 +152,9 @@
               </li>
             </ul>
           </div>
+          <!-- Sidebar Content -->
           <div class="leaflet-sidebar-content">
+            <!-- Introduction -->
             <div id="intro" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Introduction
@@ -179,6 +190,7 @@
                 </h6>
               </div>
             </div>
+            <!-- Attributes -->
             <div id="attributes" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Attributes
@@ -193,6 +205,7 @@
                 </h6>
               </ul>
             </div>
+            <!-- Charts & Graphs -->
             <div id="charts" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Charts & Graphs
@@ -207,6 +220,7 @@
                 </h6>
               </div>
             </div>
+            <!-- Pie Charts -->
             <div id="pies" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Pie Charts
@@ -222,34 +236,7 @@
                 </h6>
               </div>
             </div>
-            <div id="contact" class="leaflet-sidebar-pane">
-              <h1 class="leaflet-sidebar-header">
-                Contacts
-                <div class="leaflet-sidebar-close">
-                  <i class="fa fa-caret-right"></i>
-                </div>
-              </h1>
-              <div id="contact-container" class="leaflet-sidebar-inner">
-                <h6 class="p-2">
-                  For more information about this application or the data,
-                  contact the webpage creator
-                  <a
-                    href="mailto: contact@allanlu.me?subject=NYC Sewer Map Feedback&body=Message"
-                  >
-                    Allan Lu
-                  </a>
-                  or visit their GitHub at:
-                  <a
-                    href="https://github.com/allan-lu/map"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    class="text-info"
-                  >
-                    https://github.com/allan-lu</a
-                  >.
-                </h6>
-              </div>
-            </div>
+            <!-- Information -->
             <div id="info" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Information
@@ -368,11 +355,37 @@
                 </ul>
               </div>
             </div>
+            <!-- Contacts -->
+            <div id="contact" class="leaflet-sidebar-pane">
+              <h1 class="leaflet-sidebar-header">
+                Contacts
+                <div class="leaflet-sidebar-close">
+                  <i class="fa fa-caret-right"></i>
+                </div>
+              </h1>
+              <div id="contact-container" class="leaflet-sidebar-inner">
+                <h6 class="p-2">
+                  For more information about this application or the data,
+                  contact the webpage creator
+                  <a
+                    href="mailto: contact@allanlu.me?subject=NYC Sewer Map Feedback&body=Message"
+                  >
+                    Allan Lu
+                  </a>
+                  or visit their GitHub at:
+                  <a
+                    href="https://github.com/allan-lu/map"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    class="text-info"
+                  >
+                    https://github.com/allan-lu</a
+                  >.
+                </h6>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="footer row bg-light justify-content-between">
-        <div class="px-2"></div>
       </div>
     </div>
   </body>
