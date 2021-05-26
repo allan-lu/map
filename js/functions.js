@@ -330,10 +330,16 @@ const renameProperty = (prop, value) => {
       break
     case "gi_count":
       attribute = "Number of Green Infrastructures"
+      value = value.toLocaleString("en")
       break
     case "gi_area":
       attribute = "Combined Green Infrastructure Area"
-      value = value.toLocaleString("en")
+      area1 = Math.round(value).toLocaleString("en")
+      area2 = (value / 43560.0).toLocaleString("en", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+      value = `${area1} sqft || ${area2} acres`
       break
     case "pervious_pct":
       attribute = "Percent Area of Pervious Land"
@@ -345,6 +351,7 @@ const renameProperty = (prop, value) => {
       break
     case "sewer_311_calls":
       attribute = "311 Calls in 2019 Related to Sewer/Sewage Incidents"
+      value = value.toLocaleString("en")
       break
     case "csa_pct":
       attribute = "Percent Area With a Combined Sewer System"
@@ -358,7 +365,10 @@ const renameProperty = (prop, value) => {
     case "area":
       attribute = "NTA Area"
       area1 = Math.round(value).toLocaleString("en")
-      area2 = (value / 43560.0).toFixed(2).toLocaleString("en")
+      area2 = (value / 43560.0).toLocaleString("en", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
       value = `${area1} sqft || ${area2} acres`
       break
     case "borough":
@@ -770,7 +780,10 @@ const leaveHighlight = (e, d) => {
   $("#attr-list li").each((i, e) => {
     const propName = $(e).attr("id").split(/-(.+)/)[1].replaceAll("-", "_")
     d.borough = getBorough(d.geoid)
-    const [attribute, value] = renameProperty(propName, d[propName])
+    const [attribute, value] =
+      propName !== "sewershed"
+        ? renameProperty(propName, d[propName])
+        : [null, d[propName]]
 
     $(e)
       .find(".attr-value")
