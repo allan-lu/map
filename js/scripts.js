@@ -261,14 +261,15 @@ $.getJSON(
 
     // Sort the polygons by the neighborhood name in ascending order
     data.features.sort((a, b) => {
-      const i = a.properties.neighborhood
-      const j = b.properties.neighborhood
+      // Also sort the neighborhood names within each NTA
+      const i = a.properties.neighborhood.split("-").sort().join("-")
+      const j = b.properties.neighborhood.split("-").sort().join("-")
       return i < j ? -1 : 1
     })
 
     for (const i in data.features) {
       const nta = data.features[i]
-      const neighborhood = nta.properties.neighborhood
+      const neighborhood = nta.properties.neighborhood.split("-").sort().join("-")
 
       if (
         !["park-cemetery-etc", "Airport"].some(str =>
@@ -391,7 +392,8 @@ const searchControl = new L.Control.Search({
   layer: ntaCSA,
   propertyName: "neighborhood",
   marker: false,
-  initial: false
+  initial: false,
+  textPlaceholder: "Search Neighborhood"
 })
 myMap.addControl(searchControl)
 
@@ -450,8 +452,8 @@ L.drawLocal.draw.toolbar.buttons.rectangle = "Rectangle select"
 L.drawLocal.draw.toolbar.buttons.circle = "Circle select"
 L.drawLocal.edit.toolbar.buttons.edit = "Edit selector polygon"
 L.drawLocal.edit.toolbar.buttons.editDisabled = "No selector polygon to edit"
-L.drawLocal.edit.toolbar.buttons.remove = "Delete selection"
-L.drawLocal.edit.toolbar.buttons.removeDisabled = "No selections to delete"
+L.drawLocal.edit.toolbar.buttons.remove = "Clear selection"
+L.drawLocal.edit.toolbar.buttons.removeDisabled = "No polygons selectedd"
 
 // Remove options from delete drawn layers button
 L.EditToolbar.Delete.include({

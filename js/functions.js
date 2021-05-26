@@ -74,7 +74,7 @@ const displayPopup = (e, prop) => {
     prop === "sewershed"
       ? getSewershed(feature.properties[prop])
       : prop === "neighborhood"
-      ? feature.properties[prop].replaceAll("-", ",<br>")
+      ? feature.properties[prop].split("-").sort().join(",<br>")
       : prop === "treatment_plant"
       ? capitalize(feature.properties[prop])
       : prop === "sewer_type"
@@ -172,6 +172,9 @@ const selectAndZoom = (props, gid, bounds, pad) => {
 
     // Zoom to selected feature
     zoomToBounds(bounds, pad)
+
+    // Create a pie chart comparing pervious to impervious land area
+    createPies([props])
   }
 
   // Change CSS of Leaflet Draw delete button to "enabled"
@@ -316,7 +319,6 @@ const renameProperty = (prop, value) => {
       break
     case "neighborhood":
       attribute = "Neighborhood(s)"
-      // value = value.replaceAll("-", ", ")
       value = value
         .split(/-|,\s*/)
         .sort()
@@ -368,6 +370,7 @@ const renameProperty = (prop, value) => {
   return [attribute, value]
 }
 
+// Get borough from NTA code
 const getBorough = ntaCode => {
   switch (ntaCode.substring(0, 2)) {
     case "BK":
@@ -385,8 +388,9 @@ const getBorough = ntaCode => {
   }
 }
 
-const getSewershed = accr => {
-  switch (accr) {
+// Get sewershed name from abbreviation
+const getSewershed = abbr => {
+  switch (abbr) {
     case "26W":
       return "26th Ward"
     case "BB":
@@ -420,6 +424,7 @@ const getSewershed = accr => {
   }
 }
 
+// Get sewer type
 const getSewerType = sewer => {
   if (sewer === "OTHER" || sewer === "UNKNOWN" || sewer === null) {
     return "Other / Unknown"
@@ -788,6 +793,12 @@ const leaveHighlight = (e, d) => {
 const createPies = attrArray => {
   // Sort the data by NTA code
   const data = attrArray.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
+  // Chart title
+  let title = `Pervious vs Impervious Land Area for ${attrArray[0].neighborhood
+    .split(/-|,\s*/)
+    .sort()
+    .join(", ")
+    .replace(/, ([^,]*)$/, " & $1")}`
 
   // Variables that determine chart area
   const margin = 10
@@ -830,14 +841,6 @@ const createPies = attrArray => {
     .classed("d-block", false)
   d3.select("#pie-container").selectAll("svg, h5, p").remove()
 
-  // Pie chart title
-  $("#pie-container").append(
-    $("<h5>")
-      .attr("id", `ratio-title`)
-      .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
-      .text("Pervious vs Impervious Land Area for Selected NTAs")
-  )
-
   // Pie chart container
   const svg = d3
     .select("#pie-container")
@@ -856,15 +859,6 @@ const createPies = attrArray => {
     .join("path")
     .attr("prop", d => d.data.name)
     .attr("d", arc)
-    .on("mouseover", (e, d) => {
-      d3.select(e.target).attr("opacity", 0.7)
-      d3.select(e.target).style("cursor", "pointer")
-    })
-    .on("mouseout", (e, d) => {
-      d3.select(e.target).attr("opacity", 1)
-      d3.select(e.target).style("cursor", "pointer")
-    })
-    .on("click", drillDown)
     .attr("fill", d => color(d.data.name))
     .append("svg:title")
     .text(d => capitalize(d.data.name.split("_")[0]))
@@ -878,19 +872,6 @@ const createPies = attrArray => {
     .selectAll("text")
     .data(arcs)
     .join("text")
-    .on("mouseover", (e, d) => {
-      d3.select("#perv-pie")
-        .selectAll(`[prop=${d.data.name}]`)
-        .attr("opacity", 0.7)
-      d3.select(e.target).style("cursor", "pointer")
-    })
-    .on("mouseout", (e, d) => {
-      d3.select("#perv-pie")
-        .selectAll(`[prop=${d.data.name}]`)
-        .attr("opacity", 1)
-      d3.select(e.target).style("cursor", "pointer")
-    })
-    .on("click", drillDown)
     .attr("fill", "white")
     .attr("transform", d => `translate(${arcLabel.centroid(d)})`)
     // Pervious/impervious label
@@ -919,13 +900,55 @@ const createPies = attrArray => {
         .text(d => capitalize(d.data.name.split("_")[0]))
     )
 
-  // Instructory text
-  $("#pie-container").append(
-    $("<p>")
+  // If more than one polygon is selected add drill down functionality to chart
+  if (attrArray.length > 1) {
+    // Events on the pie sectors
+    d3.selectAll("#pie-container path")
+      .on("mouseover", (e, d) => {
+        d3.select(e.target).attr("opacity", 0.7)
+        d3.select(e.target).style("cursor", "pointer")
+      })
+      .on("mouseout", (e, d) => {
+        d3.select(e.target).attr("opacity", 1)
+        d3.select(e.target).style("cursor", "pointer")
+      })
+      .on("click", drillDown)
+
+    // Events on sector labels
+    d3.selectAll("#pie-container text")
+      .on("mouseover", (e, d) => {
+        d3.select("#perv-pie")
+          .selectAll(`[prop=${d.data.name}]`)
+          .attr("opacity", 0.7)
+        d3.select(e.target).style("cursor", "pointer")
+      })
+      .on("mouseout", (e, d) => {
+        d3.select("#perv-pie")
+          .selectAll(`[prop=${d.data.name}]`)
+          .attr("opacity", 1)
+        d3.select(e.target).style("cursor", "pointer")
+      })
+      .on("click", drillDown)
+
+    // Instructory text
+    $("#pie-container").append(
+      $("<p>")
+        .attr("id", `ratio-title`)
+        .css("font-size", "1.3em")
+        .addClass(["text-wrap", "text-center", "p-0", "m-0"])
+        .text("Select a sector to drill down and reveal additional data.")
+    )
+
+    // Also change the title
+    title = "Pervious vs Impervious Land Area for Selected NTAs"
+  }
+
+  // Pie chart title
+  $("#pie-container").prepend(
+    $("<h5>")
       .attr("id", `ratio-title`)
-      .css("font-size", "1.3em")
-      .addClass(["text-wrap", "text-center", "p-0", "m-0"])
-      .text("Select a sector to drill down and reveal additional data.")
+      .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
+      .text(title)
   )
 }
 
@@ -1047,7 +1070,7 @@ const drillDown = (e, d) => {
     })
     .attr("dy", ".35em")
     .attr("text-anchor", "middle")
-    .text(d => (data.length < 40 ? d3.format(".1%")(d.data[value]) : null))
+    .text(d => (data.length <= 40 ? d3.format(".1%")(d.data[value]) : null))
     .append("svg:title")
     .text(d => d.data.neighborhood)
 
@@ -1080,6 +1103,7 @@ const drillDown = (e, d) => {
       $("<p>")
         .attr("id", `ratio-title`)
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
-        .text("For percentage labels to show, select fewer than 40 NTAs.")
+        .html(`For percentage labels to show, select 40 or fewer NTAs.
+        <br/>(${data.length} currently selected)`)
     )
 }
