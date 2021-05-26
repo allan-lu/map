@@ -196,8 +196,12 @@ legend.onAdd = map => {
   let labels = []
   for (let i = 0; i < grades.length; i++) {
     labels.push(
-      `<i style="background: ${colorFunc(grades[i] + 0.01)}"></i>${(grades[i] * 100).toFixed(1)}%` +
-        (grades[i + 1] ? "&ndash;" + ((grades[i + 1] - 0.001) * 100).toFixed(1) + "%" : "&ndash;100%")
+      `<i style="background: ${colorFunc(grades[i] + 0.01)}"></i>${(
+        grades[i] * 100
+      ).toFixed(1)}%` +
+        (grades[i + 1]
+          ? "&ndash;" + ((grades[i + 1] - 0.001) * 100).toFixed(1) + "%"
+          : "&ndash;100%")
     )
   }
   html.push(labels.join("<br>"))
@@ -457,39 +461,60 @@ L.EditToolbar.Delete.include({
   }
 })
 
+// Add selector tools to to map
 const drawControl = new L.Control.Draw(drawOptions).addTo(myMap)
 
 // Map events
 myMap.on({
-  overlayadd: e => {
+  // When a map layer is added:
+  overlayadd: layer => {
+    // Add corresponding legend
     myMap.addControl(legend)
+
+    // Retain highlighted polygon if multiple polygons are selected
+    if (layer.group.name === "Neighborhoods") {
+      layer.layer.eachLayer(i => {
+        const geoid = i.feature.properties.geoid
+        if (geoidArray.map(d => d.geoid).includes(geoid)) {
+          i.setStyle(myStyle.selectAndHighlight)
+        }
+      })
+    }
   },
-  "draw:toolbaropened": e => {
+  // While drawing the selector polygon, prevent map layer events
+  "draw:toolbaropened": () => {
     ntaCSA.eachLayer(layer => {
       layer.off()
     })
   },
-  "draw:toolbarclosed": e => {
+  // Re-enable map layer events when stopped/finished drawing
+  "draw:toolbarclosed": () => {
     ntaCSA.eachLayer(layer => {
       onEachNTAFeature(null, layer)
     })
   },
+  // When a selector polygon is drawn:
   "draw:created": e => {
     const layer = e.layer
-
+    // Find which polygons were selected
     const selectedFeatures = selectMultiple(layer)
+
     // If no polygons selected end drawing
     if (selectedFeatures.length === 0) {
       return
     }
+
+    // Create an attribute object of the selected polygons
     const selectedAttr = createAttrObj(selectedFeatures)
+    // In the attributes sidebar tab, combine all the properties of the selected polygons
     combineProperties(selectedAttr)
 
+    // Draw the bar & pie charts
     createChart(selectedAttr, "gi_count")
     createChart(selectedAttr, "csa_pct")
-
     createPies(selectedAttr)
   },
+  // When the selector polygon is edited, update the selected polygons & sidebar panes
   "draw:edited": e => {
     const layer = e.layers.getLayers()[0]
 

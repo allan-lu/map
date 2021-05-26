@@ -110,7 +110,10 @@ const highlightFeature = e => {
   const target = e.target
   const gid = target.feature.properties.gid
   const geoid = target.feature.properties.geoid
-  if (gidArray.includes(gid)) {
+
+  if (geoidArray.map(d => d.geoid).includes(geoid)) {
+    highlightSelected(null, target.feature.properties)
+  } else if (gidArray.includes(gid)) {
     // Highlight bar in bar chart
     highlightSelected(null, target.feature.properties)
   } else {
@@ -125,6 +128,8 @@ const resetToDefault = e => {
   const geoid = target.feature.properties.geoid
   const stylePrev = target.defaultOptions.style(target.feature)
 
+  // When multiple polygons are selected, prevent the polygon that was
+  // both highlighted and selected from resetting when hovered over
   if (geoidArray.map(d => d.geoid).includes(geoid)) {
     return
   }
@@ -404,7 +409,8 @@ const getSewerType = sewer => {
   }
 }
 
-//
+// Find which polygons were selected using Turf.js's booleanWithin function
+// Returns an array of the selected polygon's gid's
 const selectMultiple = layer => {
   let drawnGJSON = layer.toGeoJSON()
 
@@ -705,6 +711,7 @@ const unhighlightSelected = (e, d) => {
   })
 }
 
+// Makes the highlighted bar, sector and polygon stay highlighted
 const leaveHighlight = (e, d) => {
   geoidArray.forEach(e => unhighlightSelected(null, e))
   geoidArray.length = 0
