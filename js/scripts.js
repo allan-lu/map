@@ -158,11 +158,11 @@ legend.onAdd = map => {
     grades = [0, 0.072, 0.273, 0.554, 0.739, 0.861, 0.948]
     colorFunc = myStyle.getChoroColorCSA
     title =
-      '<h6 class="font-weight-bold">Percent of Combined <br> Sewer Areas</h6>'
+      '<h6 class="font-weight-bold">Combined Sewer <br> Areas Percentage</h6>'
   } else {
     grades = [0, 0.368, 0.487, 0.581, 0.67, 0.756, 0.829]
     colorFunc = myStyle.getChoroColorImperv
-    title = '<h6 class="font-weight-bold">Percent of <br> Impervious Land</h6>'
+    title = '<h6 class="font-weight-bold">Impervious Surfaces <br> Percentage</h6>'
   }
 
   let html = [title]
@@ -192,7 +192,7 @@ myMap.createPane("pointsPane")
 const groupedOverlays = {
   Neighborhoods: {
     "CSA Percentage": ntaCSA,
-    "Impervious Percent": ntaImpervious
+    "Impervious Percentage": ntaImpervious
   },
   "Green Infrastructures": {
     Constructed: giClustersCon,

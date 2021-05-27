@@ -354,11 +354,11 @@ const renameProperty = (prop, value) => {
       value = `${area1} sqft || ${area2} acres`
       break
     case "pervious_pct":
-      attribute = "Percent Area of Pervious Land"
+      attribute = "Percentage of Pervious Surface Area"
       value = (value * 100.0).toFixed(2) + "%"
       break
     case "impervious_pct":
-      attribute = "Percent Area of Impervious Land"
+      attribute = "Percentage of Impervious Surface Area"
       value = (value * 100.0).toFixed(2) + "%"
       break
     case "calls_311":
@@ -1031,7 +1031,7 @@ const createPies = attrArray => {
   // Sort the data by NTA code
   const data = attrArray.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
   // Chart title
-  let title = `Pervious vs Impervious Land Area of ${attrArray[0].neighborhood
+  let title = `Impervious Surface Area of ${attrArray[0].neighborhood
     .split(/-|,\s*/)
     .sort()
     .join(", ")
@@ -1177,7 +1177,7 @@ const createPies = attrArray => {
     )
 
     // Also change the title
-    title = "Pervious vs Impervious Land Area of Selected NTAs"
+    title = "Impervious Surface Area of Selected NTAs"
   }
 
   // Pie chart title
@@ -1236,10 +1236,10 @@ const drillDown = (e, d) => {
       .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
       .text(
-        `Percent Area of ${d3
+        `Percentage of ${d3
           .select(e.target)
           .select("title")
-          .text()} Land for Selected NTAs`
+          .text()} Surfaces for Selected NTAs`
       )
   )
 
