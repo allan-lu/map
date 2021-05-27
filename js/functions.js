@@ -1,6 +1,5 @@
 // Add NTA attributes to a div in the sidebar
 const displayAttributes = property => {
-  // $.isEmptyObject(property)
   const boroughs = property.geoid.split(", ").map(getBorough)
   property.borough = [...new Set(boroughs)].join(", ")
 
@@ -119,7 +118,6 @@ const movePopup = e => {
 const highlightFeature = e => {
   const target = e.target
   const gid = target.feature.properties.gid
-  // const geoid = target.feature.properties.geoid
 
   if (gidArray.includes(gid)) {
     // Highlight bar in bar chart
@@ -343,7 +341,7 @@ const renameProperty = (prop, value) => {
       value = value.toLocaleString("en")
       break
     case "gi_count":
-      attribute = "Number of Green Infrastructures"
+      attribute = "Number of Green Infrastructures By Status"
       value = value.toLocaleString("en")
       break
     case "gi_area":
@@ -488,10 +486,6 @@ const selectMultiple = layer => {
   combineProperties(selectedAttr)
 
   // Draw the bar & pie charts
-
-  // createChart(selectedAttr, "csa_pct")
-  createPies(selectedAttr)
-
   createStackedBar(selectedAttr, ["gi_con", "gi_incon", "gi_plan"], "gi_count")
   createStackedBar(
     selectedAttr,
@@ -499,6 +493,7 @@ const selectMultiple = layer => {
     "calls_311"
   )
   createChart(selectedAttr, "population")
+  createPies(selectedAttr)
 }
 
 // Find which polygons were selected using Turf.js's booleanWithin function
