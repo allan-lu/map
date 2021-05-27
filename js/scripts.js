@@ -226,7 +226,7 @@ const layerControls = L.control
 
 // Get NTA geoJSON data
 $.getJSON(
-  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-sewers-wgs84-1.geojson",
+  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-sewers-wgs84.geojson",
   data => {
     // Add data to GeoJSON layer
     ntaCSA.addData(data)
