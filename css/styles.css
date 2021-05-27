@@ -94,6 +94,7 @@ body {
 
 /* Prevent the highlighting of text */
 .unselectable,
+.leaflet-popup-content,
 .leaflet-control-zoomhome,
 .leaflet-control-layers,
 .leaflet-sidebar-header,
