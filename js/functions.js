@@ -83,7 +83,7 @@ const displayPopup = (e, prop) => {
     prop === "sewershed"
       ? getSewershed(feature.properties[prop])
       : prop === "neighborhood"
-      ? feature.properties[prop].split("-").sort().join(",<br>")
+      ? feature.properties[prop].split(/-(?![a-z])|,\s*/).sort().join(",<br>")
       : prop === "treatment_plant"
       ? capitalize(feature.properties[prop])
       : prop === "sewer_type"
@@ -328,7 +328,7 @@ const renameProperty = (prop, value) => {
     case "neighborhood":
       attribute = "Neighborhood(s)"
       value = value
-        .split(/-|,\s*/)
+        .split(/-(?![a-z])|,\s*/)
         .sort()
         .join(", ")
       break

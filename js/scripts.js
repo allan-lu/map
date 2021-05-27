@@ -248,7 +248,7 @@ $.getJSON(
         .join("-")
 
       if (
-        !["park-cemetery-etc", "Airport"].some(str =>
+        !["-cemetery-etc-park", "-park-cemetery-etc", "Airport"].some(str =>
           neighborhood.includes(str)
         )
       ) {
