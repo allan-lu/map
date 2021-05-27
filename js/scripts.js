@@ -162,7 +162,8 @@ legend.onAdd = map => {
   } else {
     grades = [0, 0.368, 0.487, 0.581, 0.67, 0.756, 0.829]
     colorFunc = myStyle.getChoroColorImperv
-    title = '<h6 class="font-weight-bold">Impervious Surfaces <br> Percentage</h6>'
+    title =
+      '<h6 class="font-weight-bold">Impervious Surfaces <br> Percentage</h6>'
   }
 
   let html = [title]
@@ -232,30 +233,43 @@ $.getJSON(
     ntaCSA.addData(data)
     ntaImpervious.addData(data)
 
-    // Sort the polygons by the neighborhood name in ascending order
-    data.features.sort((a, b) => {
-      // Also sort the neighborhood names within each NTA
-      const i = a.properties.neighborhood.split("-").sort().join("-")
-      const j = b.properties.neighborhood.split("-").sort().join("-")
-      return i < j ? -1 : 1
-    })
+    // Create left side neighborhod panel
+    data.features
+      // Filter out airports and parks
+      .filter(e => {
+        const neighborhoods = e.properties.neighborhood.split(/-(?![a-z])|,\s*/)
 
-    for (const i in data.features) {
-      const nta = data.features[i]
-      const neighborhood = nta.properties.neighborhood
-        .split("-")
-        .sort()
-        .join("-")
-
-      if (
-        !["-cemetery-etc-park", "-park-cemetery-etc", "Airport"].some(str =>
-          neighborhood.includes(str)
+        return !["cemetery-etc-park", "park-cemetery-etc", "Airport"].some(
+          str => neighborhoods.includes(str)
         )
-      ) {
-        // Add neighborhood names to left side panel
+          ? true
+          : false
+      })
+      // Split NTA names into individual neighborhoods
+      .map(e => {
+        const properties = e.properties
+        const neighborhoods = properties.neighborhood.split(/-(?![a-z])|,\s*/)
+        const bounds = L.geoJSON(e).getBounds()
+
+        return neighborhoods.map(el => {
+          const obj = {}
+          obj[el] = properties
+          obj[el].bounds = bounds
+          return obj
+        })
+      })
+      .flat()
+      // Alphabetize
+      .sort((a, b) => (Object.keys(a)[0] < Object.keys(b)[0] ? -1 : 1))
+      // Create clickable neighborhood elements
+      .forEach(e => {
+        const neighborhood = Object.keys(e)[0]
+        const properties = Object.values(e)[0]
+        const bounds = properties.bounds
         $("#nbhd-list").append(
           $("<a>")
             .addClass([
+              // `gid-${properties.gid}`,
               "col",
               "list-group-item",
               "list-group-item-action",
@@ -263,14 +277,13 @@ $.getJSON(
               "unselectable"
             ])
             .text(neighborhood)
-            .attr({ id: nta.properties.gid, title: "Select a neighborhood" })
+            .attr({ gid: properties.gid, title: "Select a neighborhood" })
             .data({
-              properties: nta.properties,
-              bounds: L.geoJSON(nta).getBounds()
+              properties: properties,
+              bounds: bounds
             })
         )
-      }
-    }
+      })
 
     // Add events to the list items in the leftside panel
     $("#nbhd-list")
@@ -283,11 +296,11 @@ $.getJSON(
         // Display neighborhood attributes on rightside panel when element is clicked
         click: e => {
           const feature = $(e.target).data()
-          const gid = parseInt($(e.target).attr("id"))
+          const gid = feature.properties.gid
           const bounds = feature.bounds
           const padding = [90, 90]
 
-          selectAndZoom(feature.properties, gid, bounds, padding)
+          selectAndZoom(feature.properties, gid, bounds, padding, false)
         }
       })
   }

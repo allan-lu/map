@@ -13,7 +13,7 @@ const displayAttributes = property => {
     const [attribute, value] = renameProperty(key, property[key])
 
     // Create the attribute list items with a heading and paragraph elements
-    // Do not display unnecessary variables (_uid_ & gid)
+    // Do not display some variables
     if (
       ![
         "_uid_",
@@ -22,7 +22,8 @@ const displayAttributes = property => {
         "gi_plan",
         "gi_count",
         "calls_311_flood",
-        "calls_311_odor"
+        "calls_311_odor",
+        "bounds"
       ].includes(key)
     ) {
       // Create an id for each list item using the variable names
@@ -148,7 +149,7 @@ const resetToDefault = e => {
 }
 
 // Select and zoom to polygon(s)
-const selectAndZoom = (props, gid, bounds, pad) => {
+const selectAndZoom = (props, gid, bounds, pad, scroll = true) => {
   // If multiple polygons are selected, selecting one within them
   // will highlight information about that NTA across all elements
   if (gidArray.length > 1 && gidArray.includes(gid)) {
@@ -172,8 +173,11 @@ const selectAndZoom = (props, gid, bounds, pad) => {
   } else {
     clearNTAs()
 
-    // Select feature in both the left panel and map
+    // Select feature on the map
     selectNTA(gid)
+
+    // Highlight and scroll to selected neighborhood on the left side
+    highlightLeftPanel(gid, "rgba(126, 186, 73, 0.3)", scroll)
 
     // Display neighborhood attributes in right panel
     displayAttributes(props)
@@ -211,9 +215,6 @@ const zoomToBounds = (bounds, pad = [0, 0]) => {
 
 // Actions performed when an NTA is selected
 const selectNTA = gid => {
-  // Highlight and scroll to selected neighborhood on the left side
-  highlightLeftPanel(gid, "rgba(126, 186, 73, 0.3)")
-
   ntaLayerGroup.eachLayer(layer => {
     layer.eachLayer(i => {
       if (i.feature.properties.gid === gid) {
@@ -228,9 +229,11 @@ const selectNTA = gid => {
 }
 
 // Highlight and scroll to selected neighborhood on the left side
-const highlightLeftPanel = (gid, color) => {
-  $(`#${gid}`).css("background-color", color)
-  document.getElementById(`${gid}`).scrollIntoView({ block: "center" })
+const highlightLeftPanel = (gid, color, scroll) => {
+  $(`[gid="${gid}"]`).css("background-color", color)
+  if (!!scroll) {
+    $(`[gid="${gid}"]`)[0].scrollIntoView({ block: "center" })
+  }
 }
 
 // Clearing visual properties and removing selected NTAs from layer group and array
@@ -529,6 +532,7 @@ const findWithin = layer => {
     if (counter === len) {
       const gid = features[0].properties.gid
       selectNTA(gid)
+      highlightLeftPanel(gid, "rgba(126, 186, 73, 0.3)")
     }
   })
 
