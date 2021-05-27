@@ -341,7 +341,7 @@ const renameProperty = (prop, value) => {
       value = value.toLocaleString("en")
       break
     case "gi_count":
-      attribute = "Number of Green Infrastructures By Status"
+      attribute = "Number of Green Infrastructures By Construction Progress"
       value = value.toLocaleString("en")
       break
     case "gi_area":
