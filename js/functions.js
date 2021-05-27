@@ -15,7 +15,17 @@ const displayAttributes = property => {
 
     // Create the attribute list items with a heading and paragraph elements
     // Do not display unnecessary variables (_uid_ & gid)
-    if (!["_uid_", "gid"].includes(key)) {
+    if (
+      ![
+        "_uid_",
+        "gid",
+        "gi_incon",
+        "gi_plan",
+        "gi_count",
+        "calls_311_flood",
+        "calls_311_odor"
+      ].includes(key)
+    ) {
       // Create an id for each list item using the variable names
       const id = "attr-" + key.split("_").join("-")
 
@@ -328,6 +338,10 @@ const renameProperty = (prop, value) => {
       attribute = capitalize(prop)
       value = value.toLocaleString("en")
       break
+    case "gi_con":
+      attribute = "Number of Constructed Green Infrastructures"
+      value = value.toLocaleString("en")
+      break
     case "gi_count":
       attribute = "Number of Green Infrastructures"
       value = value.toLocaleString("en")
@@ -349,8 +363,8 @@ const renameProperty = (prop, value) => {
       attribute = "Percent Area of Impervious Land"
       value = (value * 100.0).toFixed(2) + "%"
       break
-    case "sewer_311_calls":
-      attribute = "311 Calls in 2019 Related to Sewer/Sewage Incidents"
+    case "calls_311":
+      attribute = `311 Calls in ${year - 1} Related to Sewer/Sewage Incidents`
       value = value.toLocaleString("en")
       break
     case "csa_pct":
@@ -443,6 +457,23 @@ const getSewerType = sewer => {
   }
 }
 
+const getCategory = status => {
+  switch (status) {
+    case "gi_con":
+      return "Constructed"
+    case "gi_incon":
+      return "In Construction"
+    case "gi_plan":
+      return "Designed"
+    case "calls_311_flood":
+      return "Clogged/Flooding"
+    case "calls_311_odor":
+      return "Sewer Odor"
+    default:
+      return status
+  }
+}
+
 // When a selector polygon is drawn, call the following functions
 const selectMultiple = layer => {
   // Find which polygons were selected
@@ -457,9 +488,17 @@ const selectMultiple = layer => {
   combineProperties(selectedAttr)
 
   // Draw the bar & pie charts
-  createChart(selectedAttr, "gi_count")
-  createChart(selectedAttr, "csa_pct")
+
+  // createChart(selectedAttr, "csa_pct")
   createPies(selectedAttr)
+
+  createStackedBar(selectedAttr, ["gi_con", "gi_incon", "gi_plan"], "gi_count")
+  createStackedBar(
+    selectedAttr,
+    ["calls_311_flood", "calls_311_odor"],
+    "calls_311"
+  )
+  createChart(selectedAttr, "population")
 }
 
 // Find which polygons were selected using Turf.js's booleanWithin function
@@ -560,10 +599,198 @@ const combineProperties = arr => {
   displayAttributes(attrObj)
 }
 
+const createStackedBar = (attrObj, properties, total) => {
+  // Sort the data by NTA code
+  const data = attrObj.slice().sort((a, b) => d3.ascending(a[total], b[total]))
+  // Stack the data by the desired columns
+  const stack = d3.stack().keys(properties)
+  const series = stack(data).map(d => (d.forEach(v => (v.key = d.key)), d))
+
+  const margin = { top: 0, right: 25, bottom: 30, left: 40 }
+  const barHeight = 15
+  const height =
+    Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
+  const width =
+    $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
+      : $(window).width() - 40
+  const x = d3
+    .scaleLinear()
+    .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
+    .range([margin.left, width - margin.right])
+  const y = d3
+    .scaleBand()
+    .domain(data.map(d => d.geoid))
+    .range([margin.top, height - margin.bottom])
+    .padding(0.1)
+  const color = d3
+    .scaleOrdinal()
+    .domain(series.map(d => d.key))
+    .range(
+      properties.length == 3
+        ? ["#143d59", "#ffd55a", "#6dd47e"]
+        : ["#efc9af", "#1f8ac0"]
+    )
+  const xAxis = g =>
+    g
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .classed("x-axis", true)
+      .call(d3.axisBottom(x).ticks(width / 80, ",~r"))
+  const yAxis = g =>
+    g
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .classed("y-axis", true)
+      .call(d3.axisLeft(y).tickSizeOuter(0))
+      .call(g => g.selectAll(".domain"))
+  const format = d3.format(",~r")
+
+  // Hide the text that's displayed when no polygons are selected
+  d3.select("#charts-container #charts-blank")
+    .classed("d-none", true)
+    .classed("d-block", false)
+
+  // Add a title to the chart
+  const title = renameProperty(total, data[0][total])[0]
+  $("#charts-container").append(
+    $("<h5>")
+      .attr("id", `${total.replace(/_/, "-")}-title`)
+      .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
+      .text(title)
+  )
+
+  // Add legend
+  const legendHeight = 15
+  let dataL = 0
+  const offset = (width - margin.left - margin.right) / properties.length
+  const legend = d3
+    .select("#charts-container")
+    .append("svg")
+    .classed("bar-legend", true)
+    .attr("preserveAspectRatio", "xMaxYMax meet")
+    .attr("viewBox", [0, 0, width, legendHeight])
+    .selectAll("g")
+    .append("g")
+    .data(properties)
+    .enter()
+    .append("g")
+    .attr("transform", (d, i) => {
+      const newdataL = dataL
+      dataL += d.length + offset
+      return `translate(${newdataL}, 0)`
+    })
+  // Legend symbols
+  legend
+    .append("rect")
+    .attr("x", margin.left + 5)
+    .attr("y", 0)
+    .attr("width", 10)
+    .attr("height", 10)
+    .attr("fill", (d, i) => color(i))
+  // Legend text
+  legend
+    .append("text")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "0.9em")
+    .attr("x", margin.left + 18)
+    .attr("y", 10)
+    .text(d => getCategory(d))
+    .attr("text-anchor", "start")
+
+  // Add bar chart
+  const svg = d3
+    .select("#charts-container")
+    .append("svg")
+    .attr("id", `${total.replace(/_/, "-")}-chart`)
+    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("viewBox", [0, 0, width, height])
+
+  // Add the bars
+  svg
+    .append("g")
+    .selectAll("g")
+    .data(series)
+    .join("g")
+    .classed("svg-stack-bar", true)
+    .attr("fill", d => color(d.key))
+    .selectAll("rect")
+    .data(d => d)
+    .join("rect")
+    .attr("geoid", d => d.data.geoid)
+    .on("mouseover", (e, d) => highlightSelected(e, d.data))
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.data.geoid))
+        unhighlightSelected(e, d.data)
+    })
+    .on("click", (e, d) => leaveHighlight(e, d.data))
+    .attr("x", d => x(d[0]))
+    .attr("y", d => y(d.data.geoid))
+    .attr("width", d => x(d[1]) - x(d[0]))
+    .attr("height", y.bandwidth())
+    .append("svg:title")
+    .text(
+      d => `${d.data.neighborhood}\n${getCategory(d.key)}: ${d.data[d.key]}`
+    )
+
+  // Add text to each bar
+  const xLabel = d3
+    .scaleLinear()
+    .domain([0, d3.max(data, d => d[total])])
+    .range([margin.left, width - margin.right])
+  const yLabel = d3
+    .scaleBand()
+    .domain(d3.range(data.length))
+    .rangeRound([margin.top, height - margin.bottom])
+    .padding(0.1)
+  svg
+    .append("g")
+    .classed("svg-bar-text", true)
+    .attr("text-anchor", "end")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 10)
+    .selectAll("text")
+    .data(data)
+    .join("text")
+    .on("mouseover", highlightSelected)
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.geoid))
+        unhighlightSelected(e, d)
+    })
+    .on("click", leaveHighlight)
+    .attr("geoid", d => d.geoid)
+    .attr("x", d => xLabel(d[total]))
+    .attr("y", (d, i) => yLabel(i) + yLabel.bandwidth() / 2)
+    .attr("dy", "0.35em")
+    .attr("dx", +4)
+    .attr("text-anchor", "start")
+    .text(d => format(d[total]))
+    .append("svg:title")
+    .text(d => d.neighborhood)
+
+  // Add axis labels
+  svg.append("g").call(xAxis)
+  svg.append("g").call(yAxis)
+
+  // Add mouse events to the y-axis's labels
+  svg
+    .selectAll(".y-axis .tick")
+    .data(data)
+    .on("mouseover", highlightSelected)
+    .on("mouseout", (e, d) => {
+      if (!geoidArray.map(d => d.geoid).includes(d.geoid))
+        unhighlightSelected(e, d)
+    })
+    .on("click", leaveHighlight)
+    .attr("geoid", d => d.geoid)
+    .append("svg:title")
+    .text(d => d.neighborhood)
+}
+
 // Create a horizontal bar chart by desired NTA property
 const createChart = (attrObj, property) => {
   // Sort the data by NTA code
-  const data = attrObj.slice().sort((a, b) => d3.ascending(a.geoid, b.geoid))
+  const data = attrObj
+    .slice()
+    .sort((a, b) => d3.ascending(a[property], b[property]))
   // Percentage properties are converted from decimals to percents
   const dataFormat = property.includes("pct") ? ".1%" : ",~r"
 
@@ -571,14 +798,6 @@ const createChart = (attrObj, property) => {
   d3.select("#charts-container #charts-blank")
     .classed("d-none", true)
     .classed("d-block", false)
-
-  // If a chart with the property has already been created, delete it
-  d3.select("#charts-container")
-    .select(`#${property.replace(/_/, "-")}-title`)
-    .remove()
-  d3.select("#charts-container")
-    .select(`#${property.replace(/_/, "-")}-chart`)
-    .remove()
 
   // Add a title to the chart
   const title = renameProperty(property, data[0][property])[0]
@@ -639,7 +858,7 @@ const createChart = (attrObj, property) => {
   // Add the bars
   svg
     .append("g")
-    .classed("svg-bars", true)
+    .classed("svg-bar", true)
     .attr("fill", "#5175b0")
     .selectAll("rect")
     .data(data)
@@ -661,7 +880,6 @@ const createChart = (attrObj, property) => {
   // Add text to each bar
   svg
     .append("g")
-    .classed("svg-bar-text", true)
     .attr("fill", "white")
     .attr("text-anchor", "end")
     .attr("font-family", "sans-serif")
@@ -708,16 +926,20 @@ const createChart = (attrObj, property) => {
     .attr("geoid", d => d.geoid)
     .append("svg:title")
     .text(d => d.neighborhood)
-
-  return svg
 }
 
 // Highlight polygons and bar chart bars on event
 const highlightSelected = (e, d) => {
   // Highlight bar chart bars and tick labels
-  d3.selectAll(".svg-bars")
+  d3.selectAll(".svg-stack-bar")
     .selectAll(`[geoid=${d.geoid}]`)
-    .attr("fill", "#508a62")
+    .attr("opacity", 0.5)
+  d3.selectAll(".svg-bar")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "#3e824f")
+  d3.selectAll(".svg-bar-text")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "#7eba49")
   d3.selectAll(".tick")
     .select("text")
     .filter(function () {
@@ -731,6 +953,7 @@ const highlightSelected = (e, d) => {
     .attr("stroke", "black")
     .attr("stroke-width", 2)
 
+  // Highlight NTA polygons
   selectedLayerGroup.eachLayer(layer => {
     if (layer.feature.properties.geoid === d.geoid) {
       layer.setStyle(myStyle.selectAndHighlight)
@@ -740,10 +963,16 @@ const highlightSelected = (e, d) => {
 
 // Unhighlight polygons and bar chart bars on event
 const unhighlightSelected = (e, d) => {
-  d3.selectAll(".svg-bars")
+  // Bar chart elements
+  d3.selectAll(".svg-stack-bar")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("opacity", 1)
+  d3.selectAll(".svg-bar")
     .selectAll(`[geoid=${d.geoid}]`)
     .attr("fill", "#5175b0")
-
+  d3.selectAll(".svg-bar-text")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "black")
   d3.selectAll(".tick")
     .select("text")
     .filter(function () {
@@ -751,11 +980,12 @@ const unhighlightSelected = (e, d) => {
     })
     .attr("fill", "black")
 
-  // Highlight pie chart arcs
+  // Pie chart arcs
   d3.selectAll(".svg-arcs")
     .selectAll(`[geoid=${d.geoid}]`)
     .attr("stroke", "white")
 
+  // Polygon features
   selectedLayerGroup.eachLayer(layer => {
     if (layer.feature.properties.geoid === d.geoid) {
       layer.setStyle(myStyle.selected)

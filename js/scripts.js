@@ -2,7 +2,8 @@ const mapboxURL =
   "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}"
 const mapboxAttribution =
   'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
-const mediaQuery = window.matchMedia("(min-width: 768px)")
+// const mediaQuery = window.matchMedia("(min-width: 768px)")
+const year = new Date().getFullYear()
 const gidArray = []
 const geoidArray = []
 const selectedLayerGroup = L.featureGroup({ pane: "pointsPane" })
@@ -98,21 +99,30 @@ const sewerAreas = L.geoJSON(null, {
 })
 
 // Green infrastructures marker layers by construction status
-const giConstructed = L.geoJSON(null, {
-  filter: feature => {
-    return ["Constructed"].some(str => feature.properties.status.includes(str))
-  }
-})
-const giInConstruction = L.geoJSON(null, {
-  filter: feature => {
-    return ["Construction"].some(str => feature.properties.status.includes(str))
-  }
-})
-const giPlanning = L.geoJSON(null, {
-  filter: feature => {
-    return ["Design"].some(str => feature.properties.status.includes(str))
-  }
-})
+const giConstructed = L.geoJSON(
+  null
+  //   , {
+  //   filter: feature => {
+  //     return ["Constructed"].some(str => feature.properties.status.includes(str))
+  //   }
+  // }
+)
+const giInConstruction = L.geoJSON(
+  null
+  //   , {
+  //   filter: feature => {
+  //     return ["Construction"].some(str => feature.properties.status.includes(str))
+  //   }
+  // }
+)
+const giPlanning = L.geoJSON(
+  null
+  //   , {
+  //   filter: feature => {
+  //     return ["Design"].some(str => feature.properties.status.includes(str))
+  //   }
+  // }
+)
 
 // Convert green infrastructure layers to marker clusters
 const giClustersCon = L.markerClusterGroup({
@@ -133,20 +143,24 @@ const giClusters = L.markerClusterGroup({
 })
 
 // 311 call layers related to sewer issues
-const callsFlooding = L.geoJSON(null, {
-  filter: feature => {
-    return ["SC", "IDG", "SA1", "SA", "SJ"].some(str =>
-      feature.properties.complaint.includes(str)
-    )
-  }
-})
-const callsOdor = L.geoJSON(null, {
-  filter: feature => {
-    return ["SA2", "ICB"].some(str =>
-      feature.properties.complaint.includes(str)
-    )
-  }
-})
+const callsFlooding = L.geoJSON(null
+//   , {
+//   filter: feature => {
+//     return ["SC", "IDG", "SA1", "SA", "SJ"].some(str =>
+//       feature.properties.complaint.includes(str)
+//     )
+//   }
+// }
+)
+const callsOdor = L.geoJSON(null
+//   , {
+//   filter: feature => {
+//     return ["SA2", "ICB"].some(str =>
+//       feature.properties.complaint.includes(str)
+//     )
+//   }
+// }
+)
 
 // Convert 311 calls layers to marker clusters
 const callsClustersFlood = L.markerClusterGroup({
@@ -254,7 +268,7 @@ const layerControls = L.control
 
 // Get NTA geoJSON data
 $.getJSON(
-  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-sewers-wgs84.geojson",
+  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-sewers-wgs84-1.geojson",
   data => {
     // Add data to GeoJSON layer
     ntaCSA.addData(data)
@@ -362,27 +376,67 @@ $.getJSON(
 )
 
 // Get green infrastructure geoJSON data
+// $.getJSON(
+//   "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
+//   data => {
+//     giConstructed.addData(data)
+//     giInConstruction.addData(data)
+//     giPlanning.addData(data)
+
+//     giClustersCon.addLayer(giConstructed)
+//     giClustersInCon.addLayer(giInConstruction)
+//     giClustersPlan.addLayer(giPlanning)
+//   }
+// )
+// Constructed
 $.getJSON(
-  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
+  "https://data.cityofnewyork.us/resource/uyfj-5xid.geojson?$where=status_gro = 'Constructed' AND the_geom is not null&$limit=25000",
   data => {
     giConstructed.addData(data)
-    giInConstruction.addData(data)
-    giPlanning.addData(data)
-
     giClustersCon.addLayer(giConstructed)
+  }
+)
+// In Construction
+$.getJSON(
+  "https://data.cityofnewyork.us/resource/uyfj-5xid.geojson?$where=status_gro = 'In Construction' AND the_geom is not null&$limit=25000",
+  data => {
+    giInConstruction.addData(data)
     giClustersInCon.addLayer(giInConstruction)
+  }
+)
+// In Planning
+$.getJSON(
+  "https://data.cityofnewyork.us/resource/uyfj-5xid.geojson?$where=status_gro = 'Final Design' AND the_geom is not null&$limit=25000",
+  data => {
+    giPlanning.addData(data)
     giClustersPlan.addLayer(giPlanning)
   }
 )
 
 // Get 311 calls geoJSON data
+// $.getJSON(
+//   "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-311calls-wgs84.geojson",
+//   data => {
+//     callsFlooding.addData(data)
+//     callsOdor.addData(data)
+
+//     callsClustersFlood.addLayer(callsFlooding)
+//     callsClustersOdor.addLayer(callsOdor)
+//   }
+// )
+// Clogged/Flooding
 $.getJSON(
-  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-311calls-wgs84.geojson",
+  `https://data.cityofnewyork.us/resource/erm2-nwe9.geojson?$where=date_extract_y(created_date)=${year - 1} AND complaint_type in ('Indoor Sewage', 'Industrial Waste', 'Sewer') AND (descriptor like '%25IDG)' OR descriptor like '%25SC)' OR descriptor like '%25SA1)' OR descriptor like '%25SA)' OR descriptor like '%25SJ)') AND location is not null&$limit=25000`,
   data => {
     callsFlooding.addData(data)
-    callsOdor.addData(data)
-
     callsClustersFlood.addLayer(callsFlooding)
+  }
+)
+// Sewer Odor
+$.getJSON(
+  `https://data.cityofnewyork.us/resource/erm2-nwe9.geojson?$where=date_extract_y(created_date)=${year - 1} AND complaint_type in ('Indoor Sewage', 'Industrial Waste', 'Sewer') AND (descriptor like '%25SA2)' OR descriptor like '%25ICB)') AND location is not null&$limit=5000`,
+  data => {
+    callsOdor.addData(data)
     callsClustersOdor.addLayer(callsOdor)
   }
 )
