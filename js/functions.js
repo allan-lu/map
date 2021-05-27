@@ -1031,7 +1031,7 @@ const createPies = attrArray => {
   // Sort the data by NTA code
   const data = attrArray.sort((a, b) => (a.geoid > b.geoid ? 1 : -1))
   // Chart title
-  let title = `Pervious vs Impervious Land Area for ${attrArray[0].neighborhood
+  let title = `Pervious vs Impervious Land Area of ${attrArray[0].neighborhood
     .split(/-|,\s*/)
     .sort()
     .join(", ")
@@ -1177,7 +1177,7 @@ const createPies = attrArray => {
     )
 
     // Also change the title
-    title = "Pervious vs Impervious Land Area for Selected NTAs"
+    title = "Pervious vs Impervious Land Area of Selected NTAs"
   }
 
   // Pie chart title
