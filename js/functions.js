@@ -578,13 +578,11 @@ const combineProperties = arr => {
   const attrObj = {}
   for (const properties of arr) {
     for (attr in properties) {
-      for (attr in properties) {
-        const value = properties[attr]
-        // Add attribute value to array
-        attrObj.hasOwnProperty(attr)
-          ? attrObj[attr].push(value)
-          : (attrObj[attr] = new Array())
-      }
+      const value = properties[attr]
+      // Add attribute value to array
+      attrObj.hasOwnProperty(attr)
+        ? attrObj[attr].push(value)
+        : (attrObj[attr] = new Array())
     }
   }
 

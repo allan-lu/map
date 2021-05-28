@@ -28,12 +28,6 @@ h6 {
   font-size: 1.2em;
 }
 
-/* Add halo effect to pie chart labels*/
-.shadow-stroke {
-  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
-    1px 1px 0 #fff;
-}
-
 #nbhd-container.panel {
   min-width: 200px;
   max-width: 200px;
@@ -41,6 +35,12 @@ h6 {
 
 #right-container.panel {
   min-width: 350px;
+}
+
+/* Add halo effect to pie chart labels*/
+.shadow-stroke {
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
+    1px 1px 0 #fff;
 }
 
 .nav-pills > a {
@@ -61,9 +61,13 @@ h6 {
   color: #7eba49;
 }
 .panel-header {
-  color: #7eba49;
+  color: #437739;
   height: 40px;
   border: none;
+}
+
+.intro-icon {
+  color: #157a75
 }
 
 /* Place scroll bar below header */
