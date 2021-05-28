@@ -64,14 +64,16 @@ const plants = L.geoJSON(null, {
 const outfalls = L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     return L.circleMarker(latlng, myStyle.outfalls)
-  }
+  },
+  interactive: false,
   // onEachFeature: onEachOutfall,
 })
 
 // Sewer Interceptors
 const interceptors = L.geoJSON(null, {
   style: myStyle.interceptors,
-  pane: "linesPane"
+  pane: "linesPane",
+  interactive: false,
 })
 
 // Sewersheds
@@ -298,7 +300,7 @@ $.getJSON(
           const feature = $(e.target).data()
           const gid = feature.properties.gid
           const bounds = feature.bounds
-          const padding = [90, 90]
+          const padding = [90, 40]
 
           selectAndZoom(feature.properties, gid, bounds, padding, false)
         }
@@ -416,7 +418,11 @@ searchControl.on({
     const gid = properties.gid
     const bounds = target.getBounds()
 
-    selectAndZoom(properties, gid, bounds, [90, 90])
+    if (gidArray.includes(gid)) {
+      zoomToBounds(bounds, [90, 40])
+    } else {
+      selectAndZoom(properties, gid, bounds, [90, 40])
+    }
   }
 })
 

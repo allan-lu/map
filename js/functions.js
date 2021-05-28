@@ -78,7 +78,7 @@ const onEachNTAFeature = (feature, layer) => {
       const properties = target.feature.properties
       const gid = target.feature.properties.gid
       const bounds = target.getBounds()
-      const padding = [90, 90]
+      const padding = [90, 40]
 
       selectAndZoom(properties, gid, bounds, padding)
     }
@@ -550,7 +550,7 @@ const findWithin = layer => {
 
   // Zoom to all selected polygons
   if (selectedLayerGroup.getLayers().length) {
-    zoomToBounds(selectedLayerGroup.getBounds(), [90, 90])
+    zoomToBounds(selectedLayerGroup.getBounds(), [90, 40])
   }
 
   return gidArray
