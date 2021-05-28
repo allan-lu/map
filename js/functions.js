@@ -31,8 +31,8 @@ const displayAttributes = property => {
 
       $(".attr-list").append(
         $("<li>")
-          .attr("id", id)
-          .addClass(["list-group-item", "p-0"])
+          .attr("prop", id)
+          .addClass(["list-group-item", "p-0", "bg-light"])
           .css("border", "none")
           .append(
             // Create attribute element
@@ -49,13 +49,13 @@ const displayAttributes = property => {
   // Move the neighborhood and borough list item to the top of the list
   $(".attr-list").each(function (i, e) {
     $(this)
-      .children(".attr-neighborhood")
+      .children('li[prop="attr-neighborhood"]')
       .remove()
-      .insertBefore($(this).children(".attr-geoid"))
+      .insertBefore($(this).children('li[prop="attr-geoid"]'))
     $(this)
-      .children(".attr-borough")
+      .children('li[prop="attr-borough"]')
       .remove()
-      .insertBefore($(this).children(".attr-geoid"))
+      .insertBefore($(this).children('li[prop="attr-geoid"]'))
   })
 }
 
@@ -165,7 +165,7 @@ const selectAndZoom = (props, gid, bounds, pad, scroll = true) => {
   // If multiple polygons are selected, selecting one within them
   // will highlight information about that NTA across all elements
   if (gidArray.length > 1 && gidArray.includes(gid)) {
-    leaveHighlight(null, props)
+    leaveHighlight(null, props, scroll)
   } else if (gidArray.includes(gid)) {
     // Selecting an already selected feature will unselect it on both the map
     // and the neighborhood list panel
@@ -544,7 +544,7 @@ const findWithin = layer => {
     if (counter === len) {
       const gid = features[0].properties.gid
       selectNTA(gid)
-      highlightLeftPanel(gid, "rgba(126, 186, 73, 0.3)")
+      highlightLeftPanel(gid, "rgba(126, 186, 73, 0.3)", true)
     }
   })
 
@@ -608,6 +608,118 @@ const combineProperties = arr => {
   displayAttributes(attrObj)
 }
 
+// Highlight polygons and bar chart bars on event
+const highlightSelected = (e, d) => {
+  // Highlight bar chart bars and tick labels
+  d3.selectAll(".svg-stack-bar")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .each(function () {
+      const newColor = d3.select(this).attr("alt-fill")
+      d3.select(this).attr("fill", newColor)
+    })
+  d3.selectAll(".svg-bar")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "#c482b9")
+  d3.selectAll(".svg-bar-text")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "#ab3397")
+  d3.selectAll(".tick")
+    .select("text")
+    .filter(function () {
+      return d3.select(this).text() === d.geoid
+    })
+    .attr("fill", "#ab3397")
+
+  // Highlight pie chart arcs
+  d3.selectAll(".svg-arcs")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("stroke", "black")
+    .attr("stroke-width", 2)
+
+  // Highlight NTA polygons
+  selectedLayerGroup.eachLayer(layer => {
+    if (layer.feature.properties.geoid === d.geoid) {
+      layer.setStyle(myStyle.selectAndHighlight)
+    }
+  })
+}
+
+// Unhighlight polygons and bar chart bars on event
+const unhighlightSelected = (e, d) => {
+  // Bar chart elements
+  // d3.selectAll(".svg-stack-bar")
+  //   .selectAll(`[geoid=${d.geoid}]`)
+  //   .attr("opacity", 1)
+  d3.selectAll(".svg-stack-bar")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .each(function () {
+      const prevColor = d3.select(this).attr("prev-color")
+      d3.select(this).attr("fill", prevColor)
+    })
+  d3.selectAll(".svg-bar")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "#5175b0")
+  d3.selectAll(".svg-bar-text")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("fill", "black")
+  d3.selectAll(".tick")
+    .select("text")
+    .filter(function () {
+      return d3.select(this).text() === d.geoid
+    })
+    .attr("fill", "black")
+
+  // Pie chart arcs
+  d3.selectAll(".svg-arcs")
+    .selectAll(`[geoid=${d.geoid}]`)
+    .attr("stroke", "white")
+
+  // Polygon features
+  selectedLayerGroup.eachLayer(layer => {
+    if (layer.feature.properties.geoid === d.geoid) {
+      layer.setStyle(myStyle.selected)
+    }
+  })
+}
+
+// Makes the highlighted bar, sector and polygon stay highlighted
+const leaveHighlight = (e, d, scroll = true) => {
+  // Clear all the previously selected elements
+  geoidArray.forEach(e => {
+    unhighlightSelected(null, e)
+    highlightLeftPanel(e.gid, "rgba(126, 186, 73, 0.3)")
+  })
+  geoidArray.length = 0
+  $(".attr-list li .attr-value span").remove()
+
+  // Highlight selected element across all charts, maps and panels
+  highlightSelected(e, d)
+
+  // Append selected NTA properties to the attributes tab in the sidebar
+  $(".attr-list li").each((i, e) => {
+    const propName = $(e).attr("prop").split(/-(.+)/)[1].replaceAll("-", "_")
+    d.borough = getBorough(d.geoid)
+    const [attribute, value] =
+      propName !== "sewershed"
+        ? renameProperty(propName, d[propName])
+        : [null, d[propName]]
+
+    $(e)
+      .find(".attr-value")
+      .append(
+        $("<span>")
+          .addClass(["font-weight-bold", "text-success"])
+          .text(` [${value}]`)
+      )
+  })
+
+  // Scroll to and highlight the neighborhood name on the left panel
+  highlightLeftPanel(d.gid, "rgba(255, 204, 246, 0.6)", scroll)
+
+  // Keep track of the selected NTA
+  geoidArray.push({ geoid: d.geoid, gid: d.gid })
+}
+
 const createStackedBar = (attrObj, properties, total) => {
   // Sort the data by NTA code
   const data = attrObj.slice().sort((a, b) => d3.ascending(a[total], b[total]))
@@ -620,8 +732,10 @@ const createStackedBar = (attrObj, properties, total) => {
   const height =
     Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
   const width =
-    $(window).width() > 768
+    $(window).width() > 990
       ? $("#right-container").width()
+      : $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
       : $(window).width() - 40
   const x = d3
     .scaleLinear()
@@ -639,6 +753,14 @@ const createStackedBar = (attrObj, properties, total) => {
       properties.length == 3
         ? ["#143d59", "#ffd55a", "#6dd47e"]
         : ["#efc9af", "#1f8ac0"]
+    )
+  const altColor = d3
+    .scaleOrdinal()
+    .domain(series.map(d => d.key))
+    .range(
+      properties.length == 3
+        ? ["#9c4f1a", "#5a84ff", "#d46dc3"]
+        : ["#c9afef", "#afefc9"]
     )
   const xAxis = g =>
     g
@@ -668,54 +790,34 @@ const createStackedBar = (attrObj, properties, total) => {
   )
 
   // Add legend
-  const legendHeight = 15
-  let dataL = 0
-  const offset = (width - margin.right) / properties.length
   const legend = d3
     .selectAll(".charts-container")
-    .append("svg")
-    .classed("bar-legend", true)
-    .attr("preserveAspectRatio", "xMaxYMax meet")
-    .attr("viewBox", [0, 0, width, legendHeight])
-    .selectAll("g")
-    .append("g")
+    .selectAll("legend")
     .data(properties)
     .enter()
-    .append("g")
-    .attr("transform", (d, i) => {
-      if (i === 0) {
-        dataL = d.length + offset
-        return "translate(0, 0)"
-      } else {
-        const newdataL = dataL
-        dataL += d.length + offset
-        return `translate(${newdataL}, 0)`
-      }
+    .append("div")
+    .classed("bar-legend", true)
+
+  const p = legend.append("p").classed("m-0 d-inline", true)
+  p.append("span")
+    .classed("key-dot", true)
+    .style("background", (d, i) => {
+      const color1 = color(i)
+      const color2 = altColor(i)
+      return `linear-gradient(-45deg, ${color2}, ${color2} 50%, ${color1} 50%)`
     })
-  // Legend symbols
-  legend
-    .append("rect")
-    .attr("x", margin.left + 5)
-    .attr("y", 2)
-    .attr("width", 10)
-    .attr("height", 10)
-    .attr("fill", (d, i) => color(i))
-  // Legend text
-  legend
-    .append("text")
-    .attr("font-family", "sans-serif")
-    .attr("font-size", "0.9em")
-    .attr("x", margin.left + 18)
-    .attr("y", 12)
+    .style("height", `${barHeight}px`)
+    .style("width", `${barHeight}px`)
+  p.insert("text")
+    .style("font-size", "0.75em")
     .text(d => getCategory(d))
-    .attr("text-anchor", "start")
 
   // Add bar chart
   const svg = d3
     .selectAll(".charts-container")
     .append("svg")
     .attr("id", `${total.replace(/_/, "-")}-chart`)
-    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("preserveAspectRatio", "xMaxYMin meet")
     .attr("viewBox", [0, 0, width, height])
 
   // Add the bars
@@ -730,6 +832,8 @@ const createStackedBar = (attrObj, properties, total) => {
     .data(d => d)
     .join("rect")
     .attr("geoid", d => d.data.geoid)
+    .attr("prev-color", d => color(d.key))
+    .attr("alt-fill", d => altColor(d.key))
     .on("mouseover", (e, d) => highlightSelected(e, d.data))
     .on("mouseout", (e, d) => {
       if (!geoidArray.map(d => d.geoid).includes(d.data.geoid))
@@ -829,8 +933,10 @@ const createChart = (attrObj, property) => {
   const height =
     Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
   const width =
-    $(window).width() > 768
+    $(window).width() > 990
       ? $("#right-container").width()
+      : $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
       : $(window).width() - 40
   const x = d3
     .scaleLinear()
@@ -867,7 +973,7 @@ const createChart = (attrObj, property) => {
     .selectAll(".charts-container")
     .append("svg")
     .attr("id", `${property.replace(/_/, "-")}-chart`)
-    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("preserveAspectRatio", "xMaxYMin meet")
     .attr("viewBox", [0, 0, width, height])
 
   // Add the bars
@@ -943,109 +1049,6 @@ const createChart = (attrObj, property) => {
     .text(d => d.neighborhood)
 }
 
-// Highlight polygons and bar chart bars on event
-const highlightSelected = (e, d) => {
-  // Highlight bar chart bars and tick labels
-  d3.selectAll(".svg-stack-bar")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("opacity", 0.5)
-  d3.selectAll(".svg-bar")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("fill", "#3e824f")
-  d3.selectAll(".svg-bar-text")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("fill", "#7eba49")
-  d3.selectAll(".tick")
-    .select("text")
-    .filter(function () {
-      return d3.select(this).text() === d.geoid
-    })
-    .attr("fill", "#7eba49")
-
-  // Highlight pie chart arcs
-  d3.selectAll(".svg-arcs")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("stroke", "black")
-    .attr("stroke-width", 2)
-
-  // Highlight NTA polygons
-  selectedLayerGroup.eachLayer(layer => {
-    if (layer.feature.properties.geoid === d.geoid) {
-      layer.setStyle(myStyle.selectAndHighlight)
-    }
-  })
-}
-
-// Unhighlight polygons and bar chart bars on event
-const unhighlightSelected = (e, d) => {
-  // Bar chart elements
-  d3.selectAll(".svg-stack-bar")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("opacity", 1)
-  d3.selectAll(".svg-bar")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("fill", "#5175b0")
-  d3.selectAll(".svg-bar-text")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("fill", "black")
-  d3.selectAll(".tick")
-    .select("text")
-    .filter(function () {
-      return d3.select(this).text() === d.geoid
-    })
-    .attr("fill", "black")
-
-  // Pie chart arcs
-  d3.selectAll(".svg-arcs")
-    .selectAll(`[geoid=${d.geoid}]`)
-    .attr("stroke", "white")
-
-  // Polygon features
-  selectedLayerGroup.eachLayer(layer => {
-    if (layer.feature.properties.geoid === d.geoid) {
-      layer.setStyle(myStyle.selected)
-    }
-  })
-}
-
-// Makes the highlighted bar, sector and polygon stay highlighted
-const leaveHighlight = (e, d) => {
-  // Clear all the previously selected elements
-  geoidArray.forEach(e => {
-    unhighlightSelected(null, e)
-    highlightLeftPanel(e.gid, "rgba(126, 186, 73, 0.3)")
-  })
-  geoidArray.length = 0
-  $(".attr-list li .attr-value span").remove()
-
-  // Highlight selected element across all charts, maps and panels
-  highlightSelected(e, d)
-
-  // Append selected NTA properties to the attributes tab in the sidebar
-  $(".attr-list li").each((i, e) => {
-    const propName = $(e).attr("id").split(/-(.+)/)[1].replaceAll("-", "_")
-    d.borough = getBorough(d.geoid)
-    const [attribute, value] =
-      propName !== "sewershed"
-        ? renameProperty(propName, d[propName])
-        : [null, d[propName]]
-
-    $(e)
-      .find(".attr-value")
-      .append(
-        $("<span>")
-          .addClass(["font-weight-bold", "text-success"])
-          .text(` [${value}]`)
-      )
-  })
-
-  // Scroll to and highlight the neighborhood name on the left panel
-  highlightLeftPanel(d.gid, "rgba(230, 255, 89, 0.3)")
-
-  // Keep track of the selected NTA
-  geoidArray.push({ geoid: d.geoid, gid: d.gid })
-}
-
 // Create pie chart
 const createPies = attrArray => {
   // Sort the data by NTA code
@@ -1060,8 +1063,10 @@ const createPies = attrArray => {
   // Variables that determine chart area
   const margin = 10
   const height = (width =
-    $(window).width() > 768
+    $(window).width() > 990
       ? $("#right-container").width()
+      : $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
       : $(window).width() - 40)
   const radius = Math.min(width - margin * 2, height - margin * 2) / 2
   // Pie chart colors
@@ -1103,7 +1108,7 @@ const createPies = attrArray => {
     .selectAll(".pie-container")
     .append("svg")
     .classed("perv-pie", true)
-    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("preserveAspectRatio", "xMaxYMin meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
 
   // Add pie chart
@@ -1215,9 +1220,10 @@ const drillDown = (e, d) => {
 
   const margin = 10
   const height = (width =
-    $(window).width() > 768
-      ? // ? $(".leaflet-sidebar-pane").width()
-        $("#right-container").width()
+    $(window).width() > 990
+      ? $("#right-container").width()
+      : $(window).width() > 768
+      ? $(".leaflet-sidebar-pane").width()
       : $(window).width() - 40)
   const radius = Math.min(width - margin * 2, height - margin * 2) / 2
 
@@ -1266,7 +1272,7 @@ const drillDown = (e, d) => {
   const svg = d3
     .selectAll(".pie-container")
     .append("svg")
-    .attr("preserveAspectRatio", "xMidYMax meet")
+    .attr("preserveAspectRatio", "xMaxYMin meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
 
   // Donut pie chart

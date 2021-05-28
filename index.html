@@ -165,7 +165,7 @@
                 </div>
               </h1>
               <div
-                class="leaflet-sidebar-inner p-1 m-1"
+                class="leaflet-sidebar-inner p-2"
                 style="line-height: 100%"
               >
                 <h6>
@@ -179,9 +179,7 @@
                   <ul class="px-4">
                     <li>
                       Select a polygon and view sewer data at the Neighborhood
-                      Tabulation Area (NTA) level, such as pervious surfaces,
-                      green infrastructure area, or 311 sewer/sewage complaint
-                      calls.
+                      Tabulation Area (NTA) level.
                     </li>
                     <li>
                       <i class="intro-icon fas fa-search fa-sm"></i> &ndash;
@@ -190,8 +188,7 @@
                     <li>
                       <i class="intro-icon fas fa-square-full fa-xs"></i> /
                       <i class="intro-icon fas fa-circle fa-xs"></i> &ndash;
-                      draw a polygon to select and compare data for multiple
-                      NTAs
+                      draw a polygon to select and compare data of multiple NTAs
                     </li>
                     <li>
                       <i class="intro-icon fas fa-edit fa-sm"></i> &
@@ -204,7 +201,7 @@
                     </li>
                     <li>
                       <i class="intro-icon fas fa-expand fa-sm"></i> &ndash;
-                      maximize the map and bring out a collapsable sidebar on
+                      maximize the map, bringing out a collapsable sidebar on
                       the right
                       <em>(this button is turned off on mobile)</em>
                     </li>
@@ -213,7 +210,7 @@
                       and zoom the map back to its starting position
                     </li>
                     <li>
-                      The tabs at the top (or to the right on mobile) provide
+                      The tabs at the top <em>(right on mobile)</em> provide
                       access to more information such as NTA properties, bar
                       charts, and contact information.
                     </li>
@@ -244,8 +241,8 @@
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <div class="charts-container leaflet-sidebar-inner">
-                <h6 class="charts-blank p-2">
+              <div class="charts-container leaflet-sidebar-inner p-2">
+                <h6 class="charts-blank">
                   &emsp; Use the polygon selector tools to view charts comparing
                   data between selected neighborhoods.
                 </h6>
@@ -259,8 +256,8 @@
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <div class="pie-container leaflet-sidebar-inner">
-                <h6 class="pie-blank p-2">
+              <div class="pie-container leaflet-sidebar-inner p-2">
+                <h6 class="pie-blank">
                   &emsp; Select a polygon or use the polygon selector tools to
                   view a pie chart comparing the selected neighborhoods'
                   pervious and impervious land areas.
@@ -428,12 +425,13 @@
             p-0
             mh-100
             border
+            border-right-0
             d-flex
             flex-column
             overflow-hidden
           "
         >
-          <nav class="nav nav-pills nav-fill nav-justified">
+          <nav class="tab-container nav nav-tabs nav-fill nav-justified">
             <a
               class="nav-link active"
               data-toggle="tab"
@@ -486,10 +484,10 @@
           <!-- Panel Content -->
           <div class="tab-content overflow-auto">
             <!-- Introduction -->
-            <div id="intro-p" class="tab-pane fade show active">
-              <h3 class="panel-header text-center nav-tabs">Introduction</h3>
+            <div id="intro-p" class="tab-pane active">
+              <h3 class="panel-header text-center">Introduction</h3>
               <div class="content-inner">
-                <h6 class="m-2">
+                <h6 class="p-2">
                   &emsp; The purpose of this map is to provide a comprehensive
                   visualization of green infrastructure and sewer data at the
                   neighborhood level. Its interactivity allows for the user to
@@ -500,9 +498,7 @@
                   <ul class="px-4">
                     <li>
                       Select a polygon and view sewer data at the Neighborhood
-                      Tabulation Area (NTA) level, such as pervious surfaces,
-                      green infrastructure area, or 311 sewer/sewage complaint
-                      calls.
+                      Tabulation Area (NTA) level.
                     </li>
                     <li>
                       <i class="intro-icon fas fa-search fa-sm"></i> &ndash;
@@ -511,8 +507,7 @@
                     <li>
                       <i class="intro-icon fas fa-square-full fa-xs"></i> /
                       <i class="intro-icon fas fa-circle fa-xs"></i> &ndash;
-                      draw a polygon to select and compare data for multiple
-                      NTAs
+                      draw a polygon to select and compare data of multiple NTAs
                     </li>
                     <li>
                       <i class="intro-icon fas fa-edit fa-sm"></i> &
@@ -525,7 +520,7 @@
                     </li>
                     <li>
                       <i class="intro-icon fas fa-expand fa-sm"></i> &ndash;
-                      maximize the map and bring out a collapsable sidebar on
+                      maximize the map, bringing out a collapsable sidebar on
                       the right
                       <em>(this button is turned off on mobile)</em>
                     </li>
@@ -534,7 +529,7 @@
                       and zoom the map back to its starting position
                     </li>
                     <li>
-                      The tabs at the top (or to the right on mobile) provide
+                      The tabs at the top <em>(right on mobile)</em> provide
                       access to more information such as NTA properties, bar
                       charts, and contact information.
                     </li>
@@ -543,10 +538,10 @@
               </div>
             </div>
             <!-- Attributes -->
-            <div id="attributes-p" class="tab-pane fade">
-              <h3 class="panel-header text-center nav-tabs">Attributes</h3>
+            <div id="attributes-p" class="tab-pane">
+              <h3 class="panel-header text-center">Attributes</h3>
               <div class="content-inner">
-                <ul class="attr-list list-group m-2">
+                <ul class="attr-list list-group p-2">
                   <h6 class="attr-blank">
                     &emsp; Select one neighborhood or multiple neighborhood
                     polygons to view their properties.
@@ -555,10 +550,10 @@
               </div>
             </div>
             <!-- Charts & Graphs -->
-            <div id="charts-p" class="tab-pane fade">
-              <h3 class="panel-header text-center nav-tabs">Charts & Graphs</h3>
+            <div id="charts-p" class="tab-pane">
+              <h3 class="panel-header text-center">Charts & Graphs</h3>
               <div class="content-inner">
-                <div class="charts-container m-2">
+                <div class="charts-container p-2">
                   <h6 class="charts-blank">
                     &emsp; Use the polygon selector tools to view charts
                     comparing data between selected neighborhoods.
@@ -567,10 +562,10 @@
               </div>
             </div>
             <!-- Pie Charts -->
-            <div id="pies-p" class="tab-pane fade">
-              <h3 class="panel-header text-center nav-tabs">Pie Charts</h3>
+            <div id="pies-p" class="tab-pane">
+              <h3 class="panel-header text-center">Pie Charts</h3>
               <div class="content-inner">
-                <div class="pie-container m-2">
+                <div class="pie-container p-2">
                   <h6 class="pie-blank">
                     &emsp; Select a polygon or use the polygon selector tools to
                     view a pie chart comparing the selected neighborhoods'
@@ -580,10 +575,10 @@
               </div>
             </div>
             <!-- Information -->
-            <div id="info-p" class="tab-pane fade">
-              <h3 class="panel-header text-center nav-tabs">Information</h3>
+            <div id="info-p" class="tab-pane">
+              <h3 class="panel-header text-center">Information</h3>
               <div class="content-inner">
-                <h6 class="m-2">
+                <h6 class="p-2">
                   &emsp;
                   <a
                     href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
@@ -697,10 +692,10 @@
               </div>
             </div>
             <!-- Contacts -->
-            <div id="contact-p" class="tab-pane fade">
-              <h3 class="panel-header text-center nav-tabs">Contacts</h3>
+            <div id="contact-p" class="tab-pane">
+              <h3 class="panel-header text-center">Contacts</h3>
               <div class="content-inner">
-                <h6 class="m-2">
+                <h6 class="p-2">
                   &emsp; For more information about this application or the
                   data, contact the webpage creator
                   <a

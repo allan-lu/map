@@ -494,12 +494,12 @@ myMap.on({
   fullscreenchange: () => {
     if (myMap.isFullscreen()) {
       // Show sidebar
-      $("#sidebar").removeClass("d-md-none").addClass("d-block")
+      $("#sidebar").removeClass("d-lg-none")
       // Move controls over
       $(".leaflet-control-container .leaflet-right").removeClass("on-right")
     } else {
       sidebar.close()
-      $("#sidebar").removeClass("d-block").addClass("d-md-none")
+      $("#sidebar").addClass("d-lg-none")
       $(".leaflet-control-container .leaflet-right").addClass("on-right")
     }
   },
@@ -533,7 +533,7 @@ myMap.on({
 
 $(document).ready(() => {
   // Hide sidebar and push right side controls over
-  $("#sidebar").addClass("d-md-none")
+  $("#sidebar").addClass("d-lg-none")
   $(".leaflet-control-container .leaflet-right").addClass("on-right")
 
   // When selecting a tab in the sidebar activate the same tab in the right panel
@@ -542,9 +542,9 @@ $(document).ready(() => {
       $(e.target).attr("href") !== undefined
         ? $(e.target).attr("href").split("-")[0].concat("-p")
         : $(e.target).parent().attr("href").split("-")[0].concat("-p")
-    $(".nav-pills a").removeClass("active")
+    $(".nav-tabs a").removeClass("active")
     $(".tab-content div").removeClass(["show", "active"])
-    $(`.nav-pills a[href="${href}"]`).addClass("active")
+    $(`.nav-tabs a[href="${href}"]`).addClass("active")
     $(href).addClass(["show", "active"])
   })
 })
