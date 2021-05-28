@@ -56,9 +56,9 @@
     />
     <!-- JS SCRIPTS -->
     <!-- User Scripts -->
-    <script defer src="js/functions.min.js"></script>
+    <script defer src="js/functions.js"></script>
     <script defer src="js/styles.min.js"></script>
-    <script defer src="js/scripts.min.js"></script>
+    <script defer src="js/scripts.js"></script>
     <!-- CDN and NPM Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -119,35 +119,35 @@
           <div class="leaflet-sidebar-tabs">
             <ul role="tablist">
               <li title="Introduction">
-                <a href="#intro" role="tab"
+                <a href="#intro-s" role="tab"
                   ><i class="fas fa-star-of-life pl-1"></i
                 ></a>
               </li>
               <li title="Attributes">
-                <a href="#attributes" role="tab"
+                <a href="#attributes-s" role="tab"
                   ><i class="fa fa-bars pl-1"></i
                 ></a>
               </li>
               <li title="Charts">
-                <a href="#charts" role="tab"
+                <a href="#charts-s" role="tab"
                   ><i class="fa fa-chart-bar pl-1"></i
                 ></a>
               </li>
               <li title="Pie Charts">
-                <a href="#pies" role="tab"
+                <a href="#pies-s" role="tab"
                   ><i class="fas fa-chart-pie pl-1"></i
                 ></a>
               </li>
             </ul>
             <ul role="tablist">
               <li title="Information">
-                <a href="#info" role="tab"
+                <a href="#info-s" role="tab"
                   ><i class="far fa-question-circle pl-1"></i
                 ></a>
               </li>
               <li title="Contacts">
-                <a href="#contact" role="tab"
-                  ><i class="fas fa-user pl-1"></i
+                <a href="#contact-s" role="tab"
+                  ><i class="far fa-envelope pl-1"></i
                 ></a>
               </li>
             </ul>
@@ -155,7 +155,7 @@
           <!-- Sidebar Content -->
           <div class="leaflet-sidebar-content">
             <!-- Introduction -->
-            <div id="intro" class="leaflet-sidebar-pane">
+            <div id="intro-s" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Introduction
                 <div class="leaflet-sidebar-close">
@@ -191,45 +191,45 @@
               </div>
             </div>
             <!-- Attributes -->
-            <div id="attributes" class="leaflet-sidebar-pane">
+            <div id="attributes-s" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Attributes
                 <div class="leaflet-sidebar-close">
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <ul id="attr-list" class="leaflet-sidebar-inner list-group">
-                <h6 id="attr-blank" class="p-2">
+              <ul class="attr-list leaflet-sidebar-inner list-group p-2">
+                <h6 class="attr-blank">
                   Select one neighborhood or multiple neighborhood polygons to
                   view their properties.
                 </h6>
               </ul>
             </div>
             <!-- Charts & Graphs -->
-            <div id="charts" class="leaflet-sidebar-pane">
+            <div id="charts-s" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Charts & Graphs
                 <div class="leaflet-sidebar-close">
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <div id="charts-container" class="leaflet-sidebar-inner">
-                <h6 id="charts-blank" class="p-2">
+              <div class="charts-container leaflet-sidebar-inner">
+                <h6 class="charts-blank p-2">
                   Use the polygon selector tools to view charts comparing data
                   between selected neighborhoods.
                 </h6>
               </div>
             </div>
             <!-- Pie Charts -->
-            <div id="pies" class="leaflet-sidebar-pane">
+            <div id="pies-s" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Pie Charts
                 <div class="leaflet-sidebar-close">
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <div id="pie-container" class="leaflet-sidebar-inner">
-                <h6 id="pie-blank" class="p-2">
+              <div class="pie-container leaflet-sidebar-inner">
+                <h6 class="pie-blank p-2">
                   Select a polygon or use the polygon selector tools to view a
                   pie chart comparing the selected neighborhoods' pervious and
                   impervious land areas.
@@ -237,14 +237,14 @@
               </div>
             </div>
             <!-- Information -->
-            <div id="info" class="leaflet-sidebar-pane">
+            <div id="info-s" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Information
                 <div class="leaflet-sidebar-close">
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <div id="info-container" class="leaflet-sidebar-inner">
+              <div class="leaflet-sidebar-inner">
                 <h6 class="p-2">
                   <a
                     href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
@@ -358,14 +358,14 @@
               </div>
             </div>
             <!-- Contacts -->
-            <div id="contact" class="leaflet-sidebar-pane">
+            <div id="contact-s" class="leaflet-sidebar-pane">
               <h1 class="leaflet-sidebar-header">
                 Contacts
                 <div class="leaflet-sidebar-close">
                   <i class="fa fa-caret-right"></i>
                 </div>
               </h1>
-              <div id="contact-container" class="leaflet-sidebar-inner">
+              <div class="leaflet-sidebar-inner">
                 <h6 class="p-2">
                   For more information about this application or the data,
                   contact the webpage creator
@@ -374,7 +374,280 @@
                   >
                     Allan Lu
                   </a>
-                  or visit their GitHub at:
+                  or visit his GitHub at:
+                  <a
+                    href="https://github.com/allan-lu/map"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    class="text-info"
+                  >
+                    https://github.com/allan-lu</a
+                  >.
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- RIGHT PANEL -->
+        <div
+          id="right-container"
+          class="
+            panel
+            col-3
+            p-0
+            border
+            mh-100
+            d-flex
+            flex-column
+            overflow-hidden
+          "
+        >
+          <nav class="nav nav-pills nav-fill nav-justified">
+            <a
+              class="nav-link active"
+              data-toggle="tab"
+              href="#intro-p"
+              role="tab"
+              title="Introduction"
+              ><i class="fas fa-star-of-life fa-lg panel-icon"></i
+            ></a>
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#attributes-p"
+              role="tab"
+              title="Attributes"
+              ><i class="fa fa-bars fa-lg panel-icon"></i
+            ></a>
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#charts-p"
+              role="tab"
+              title="Bar Charts"
+              ><i class="fa fa-chart-bar fa-lg panel-icon"></i
+            ></a>
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#pies-p"
+              role="tab"
+              title="Pie Charts"
+              ><i class="fas fa-chart-pie fa-lg panel-icon"></i
+            ></a>
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#info-p"
+              role="tab"
+              title="Information"
+              ><i class="far fa-question-circle fa-lg panel-icon"></i
+            ></a>
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#contact-p"
+              role="tab"
+              title="Contacts"
+              ><i class="far fa-envelope fa-lg panel-icon"></i
+            ></a>
+          </nav>
+          <!-- Panel Content -->
+          <div class="tab-content overflow-auto">
+            <!-- Introduction -->
+            <div id="intro-p" class="tab-pane fade show active">
+              <h3 class="panel-header text-center nav-tabs">Introduction</h3>
+              <div class="content-inner">
+                <h6 class="m-2">
+                  &emsp; More than two-thirds of New York City's sewer system is
+                  a combined system where rainwater runoff, domestic sewage and
+                  industrial wastewater are collected in the same pipe and
+                  treated together at a wastewater treatment plant. During
+                  periods of heavy rainfall or snowmelt, the wastewater can
+                  exceed the capacity of the system or treatment plant and the
+                  excess wastewater is discharged directly to nearby streams,
+                  rivers, or other bodies of water.
+                  <br />
+                  &emsp; In 2010, the city’s Department of Environmental
+                  Protection implemented the NYC Green Infrastructure Program
+                  which uses manufactured landscapes to mimic natural systems in
+                  managing stormwater runoff. Some examples include rain
+                  gardens, stormwater greenstreets, green roofs and permeable
+                  paving.
+                  <br />
+                  &emsp; The purpose of this map is to provide a comprehensive
+                  visualization of green infrastructure and sewer data at the
+                  neighborhood level. Its interactivity allows for the user to
+                  select and compare attributes of multiple areas.
+                </h6>
+              </div>
+            </div>
+            <!-- Attributes -->
+            <div id="attributes-p" class="tab-pane fade">
+              <h3 class="panel-header text-center nav-tabs">Attributes</h3>
+              <div class="content-inner">
+                <ul class="attr-list list-group m-2">
+                  <h6 class="attr-blank">
+                    Select one neighborhood or multiple neighborhood polygons to
+                    view their properties.
+                  </h6>
+                </ul>
+              </div>
+            </div>
+            <!-- Charts & Graphs -->
+            <div id="charts-p" class="tab-pane fade">
+              <h3 class="panel-header text-center nav-tabs">Charts & Graphs</h3>
+              <div class="content-inner">
+                <div class="charts-container m-2">
+                  <h6 class="charts-blank">
+                    Use the polygon selector tools to view charts comparing data
+                    between selected neighborhoods.
+                  </h6>
+                </div>
+              </div>
+            </div>
+            <!-- Pie Charts -->
+            <div id="pies-p" class="tab-pane fade">
+              <h3 class="panel-header text-center nav-tabs">Pie Charts</h3>
+              <div class="content-inner">
+                <div class="pie-container m-2">
+                  <h6 class="pie-blank">
+                    Select a polygon or use the polygon selector tools to view a
+                    pie chart comparing the selected neighborhoods' pervious and
+                    impervious land areas.
+                  </h6>
+                </div>
+              </div>
+            </div>
+            <!-- Information -->
+            <div id="info-p" class="tab-pane fade">
+              <h3 class="panel-header text-center nav-tabs">Information</h3>
+              <div class="content-inner">
+                <h6 class="m-2">
+                  <a
+                    href="https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    Neighborhood Tabulation Areas (NTAs)</a
+                  >
+                  were created by the Department of City Planning. By
+                  aggregating smaller neighborhoods and breaking up larger ones,
+                  population data is more normalized and equal across each area.
+                </h6>
+                <h6 class="m-2">
+                  This web map was written in JavaScript Node.js with the
+                  <a
+                    href="https://jquery.com"
+                    target="_blank"
+                    rel="norefferer noopener"
+                    >jQuery</a
+                  >,
+                  <a
+                    href="https://leafletjs.com"
+                    target="_blank"
+                    rel="norefferer noopener"
+                  >
+                    Leaflet</a
+                  >,
+                  <a
+                    href="https://turfjs.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >Turf</a
+                  >, and
+                  <a
+                    href="https://d3js.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >D3</a
+                  >
+                  packages. Basemap imagery provided by
+                  <a
+                    href="https://www.mapbox.com"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >Mapbox</a
+                  >
+                  and
+                  <a
+                    href="https://www.openstreetmap.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >OpenStreetMap</a
+                  >
+                  contributors. The datasets were gathered from various city
+                  agencies and compiled using
+                  <a
+                    href="https://www.postgresql.org"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    >PostgreSQL</a
+                  >.
+                </h6>
+                <h6 class="px-2 mb-0">Data Sources:</h6>
+                <ul class="m-0 pl-4 small">
+                  <li>
+                    <a
+                      href="https://openseweratlas.tumblr.com"
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      >Open Sewer Atlas NYC</a
+                    >
+                  </li>
+                  <li>
+                    NYC Departments of:
+                    <ul class="pl-4">
+                      <li>
+                        <a
+                          href="https://www1.nyc.gov/site/planning/index.page"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ City Planning</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www1.nyc.gov/site/dep/index.page"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ Environmental Protection</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www1.nyc.gov/site/doitt/index.page"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ Information Technology & Telecommunications</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www.nycgovparks.org/"
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          >~ Parks & Recreation</a
+                        >
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- Contacts -->
+            <div id="contact-p" class="tab-pane fade">
+              <h3 class="panel-header text-center nav-tabs">Contacts</h3>
+              <div class="content-inner">
+                <h6 class="m-2">
+                  For more information about this application or the data,
+                  contact the webpage creator
+                  <a
+                    href="mailto: contact@allanlu.me?subject=NYC Sewer Map Feedback&body=Message"
+                  >
+                    Allan Lu
+                  </a>
+                  or visit his GitHub at:
                   <a
                     href="https://github.com/allan-lu/map"
                     target="_blank"

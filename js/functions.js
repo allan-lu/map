@@ -4,10 +4,10 @@ const displayAttributes = property => {
   property.borough = [...new Set(boroughs)].join(", ")
 
   // Clear the attribute container before every click
-  d3.select("#attr-list #attr-blank")
+  d3.selectAll(".attr-list .attr-blank")
     .classed("d-none", true)
     .classed("d-block", false)
-  $("#attr-list li").remove()
+  $(".attr-list li").remove()
   // Using a for-in loop create html elements for each attribute
   for (const key in property) {
     const [attribute, value] = renameProperty(key, property[key])
@@ -29,25 +29,34 @@ const displayAttributes = property => {
       // Create an id for each list item using the variable names
       const id = "attr-" + key.split("_").join("-")
 
-      $("#attr-list").append(
-        // Create list item element
+      $(".attr-list").append(
         $("<li>")
           .attr("id", id)
           .addClass(["list-group-item", "p-0"])
           .css("border", "none")
           .append(
-            // Create header element
-            $("<h6>").addClass(["m-1", "font-weight-bold"]).text(attribute),
-            // Create paragraph element
-            $("<h6>").addClass(["mb-2 mr-0 pl-2 attr-value"]).text(value)
+            // Create attribute element
+            $("<h6>").addClass(["font-weight-bold", "mb-0"]).text(attribute),
+            // Create value element
+            $("<h6>")
+              .addClass(["pl-2", "pt-0", "mt-0", "attr-value"])
+              .text(value)
           )
       )
     }
   }
 
   // Move the neighborhood and borough list item to the top of the list
-  $("#attr-neighborhood").remove().insertBefore($("#attr-geoid"))
-  $("#attr-borough").remove().insertBefore($("#attr-geoid"))
+  $(".attr-list").each(function (i, e) {
+    $(this)
+      .children(".attr-neighborhood")
+      .remove()
+      .insertBefore($(this).children(".attr-geoid"))
+    $(this)
+      .children(".attr-borough")
+      .remove()
+      .insertBefore($(this).children(".attr-geoid"))
+  })
 }
 
 // Add events to each NTA polygon
@@ -84,7 +93,10 @@ const displayPopup = (e, prop) => {
     prop === "sewershed"
       ? getSewershed(feature.properties[prop])
       : prop === "neighborhood"
-      ? feature.properties[prop].split(/-(?![a-z])|,\s*/).sort().join(",<br>")
+      ? feature.properties[prop]
+          .split(/-(?![a-z])|,\s*/)
+          .sort()
+          .join(",<br>")
       : prop === "treatment_plant"
       ? capitalize(feature.properties[prop])
       : prop === "sewer_type"
@@ -240,8 +252,8 @@ const highlightLeftPanel = (gid, color, scroll) => {
 const clearNTAs = () => {
   // Unselect element from left panel and clear attribute container
   $(".list-group-item").css("background-color", "")
-  $("#attr-list li").remove()
-  d3.select("#attr-list #attr-blank").classed("d-block", true)
+  $(".attr-list li").remove()
+  d3.selectAll(".attr-list .attr-blank").classed("d-block", true)
 
   // Clear selected layers
   selectedLayerGroup.clearLayers()
@@ -257,8 +269,8 @@ const clearNTAs = () => {
   drawnItems.clearLayers()
 
   // Remove charts from empty container and display text
-  d3.selectAll("#charts-blank, #pie-blank").classed("d-block", true)
-  d3.selectAll("#charts-container, #pie-container")
+  d3.selectAll(".charts-blank, .pie-blank").classed("d-block", true)
+  d3.selectAll(".charts-container, .pie-container")
     .selectAll("svg, h5, p")
     .remove()
 
@@ -611,7 +623,7 @@ const createStackedBar = (attrObj, properties, total) => {
     Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
   const width =
     $(window).width() > 768
-      ? $(".leaflet-sidebar-pane").width()
+      ? $("#right-container").width()
       : $(window).width() - 40
   const x = d3
     .scaleLinear()
@@ -644,13 +656,13 @@ const createStackedBar = (attrObj, properties, total) => {
   const format = d3.format(",~r")
 
   // Hide the text that's displayed when no polygons are selected
-  d3.select("#charts-container #charts-blank")
+  d3.selectAll(".charts-container .charts-blank")
     .classed("d-none", true)
     .classed("d-block", false)
 
   // Add a title to the chart
   const title = renameProperty(total, data[0][total])[0]
-  $("#charts-container").append(
+  $(".charts-container").append(
     $("<h5>")
       .attr("id", `${total.replace(/_/, "-")}-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
@@ -660,9 +672,9 @@ const createStackedBar = (attrObj, properties, total) => {
   // Add legend
   const legendHeight = 15
   let dataL = 0
-  const offset = (width - margin.left - margin.right) / properties.length
+  const offset = (width - margin.right) / properties.length
   const legend = d3
-    .select("#charts-container")
+    .selectAll(".charts-container")
     .append("svg")
     .classed("bar-legend", true)
     .attr("preserveAspectRatio", "xMaxYMax meet")
@@ -673,15 +685,20 @@ const createStackedBar = (attrObj, properties, total) => {
     .enter()
     .append("g")
     .attr("transform", (d, i) => {
-      const newdataL = dataL
-      dataL += d.length + offset
-      return `translate(${newdataL}, 0)`
+      if (i === 0) {
+        dataL = d.length + offset
+        return "translate(0, 0)"
+      } else {
+        const newdataL = dataL
+        dataL += d.length + offset
+        return `translate(${newdataL}, 0)`
+      }
     })
   // Legend symbols
   legend
     .append("rect")
     .attr("x", margin.left + 5)
-    .attr("y", 0)
+    .attr("y", 2)
     .attr("width", 10)
     .attr("height", 10)
     .attr("fill", (d, i) => color(i))
@@ -691,13 +708,13 @@ const createStackedBar = (attrObj, properties, total) => {
     .attr("font-family", "sans-serif")
     .attr("font-size", "0.9em")
     .attr("x", margin.left + 18)
-    .attr("y", 10)
+    .attr("y", 12)
     .text(d => getCategory(d))
     .attr("text-anchor", "start")
 
   // Add bar chart
   const svg = d3
-    .select("#charts-container")
+    .selectAll(".charts-container")
     .append("svg")
     .attr("id", `${total.replace(/_/, "-")}-chart`)
     .attr("preserveAspectRatio", "xMidYMax meet")
@@ -740,6 +757,7 @@ const createStackedBar = (attrObj, properties, total) => {
     .domain(d3.range(data.length))
     .rangeRound([margin.top, height - margin.bottom])
     .padding(0.1)
+
   svg
     .append("g")
     .classed("svg-bar-text", true)
@@ -794,13 +812,13 @@ const createChart = (attrObj, property) => {
   const dataFormat = property.includes("pct") ? ".1%" : ",~r"
 
   // Hide the text that's displayed when no polygons are selected
-  d3.select("#charts-container #charts-blank")
+  d3.selectAll(".charts-container charts-blank")
     .classed("d-none", true)
     .classed("d-block", false)
 
   // Add a title to the chart
   const title = renameProperty(property, data[0][property])[0]
-  $("#charts-container").append(
+  $(".charts-container").append(
     $("<h5>")
       .attr("id", `${property.replace(/_/, "-")}-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
@@ -814,7 +832,7 @@ const createChart = (attrObj, property) => {
     Math.ceil((data.length + 0.1) * barHeight) + margin.top + margin.bottom
   const width =
     $(window).width() > 768
-      ? $(".leaflet-sidebar-pane").width()
+      ? $("#right-container").width()
       : $(window).width() - 40
   const x = d3
     .scaleLinear()
@@ -848,7 +866,7 @@ const createChart = (attrObj, property) => {
 
   // Create the svg element that other html elements will fit in
   const svg = d3
-    .select("#charts-container")
+    .selectAll(".charts-container")
     .append("svg")
     .attr("id", `${property.replace(/_/, "-")}-chart`)
     .attr("preserveAspectRatio", "xMidYMax meet")
@@ -1000,13 +1018,13 @@ const leaveHighlight = (e, d) => {
     highlightLeftPanel(e.gid, "rgba(126, 186, 73, 0.3)")
   })
   geoidArray.length = 0
-  $("#attr-list li .attr-value span").remove()
+  $(".attr-list li .attr-value span").remove()
 
   // Highlight selected element across all charts, maps and panels
   highlightSelected(e, d)
 
   // Append selected NTA properties to the attributes tab in the sidebar
-  $("#attr-list li").each((i, e) => {
+  $(".attr-list li").each((i, e) => {
     const propName = $(e).attr("id").split(/-(.+)/)[1].replaceAll("-", "_")
     d.borough = getBorough(d.geoid)
     const [attribute, value] =
@@ -1045,7 +1063,7 @@ const createPies = attrArray => {
   const margin = 10
   const height = (width =
     $(window).width() > 768
-      ? $(".leaflet-sidebar-pane").width()
+      ? $("#right-container").width()
       : $(window).width() - 40)
   const radius = Math.min(width - margin * 2, height - margin * 2) / 2
   // Pie chart colors
@@ -1077,16 +1095,16 @@ const createPies = attrArray => {
     .outerRadius(radius * 0.6)
 
   // Hide the text that's displayed when no polygons are selected
-  d3.select("#pie-container #pie-blank")
+  d3.selectAll(".pie-container .pie-blank")
     .classed("d-none", true)
     .classed("d-block", false)
-  d3.select("#pie-container").selectAll("svg, h5, p").remove()
+  d3.selectAll(".pie-container").selectAll("svg, h5, h6").remove()
 
   // Pie chart container
   const svg = d3
-    .select("#pie-container")
+    .selectAll(".pie-container")
     .append("svg")
-    .attr("id", "perv-pie")
+    .classed("perv-pie", true)
     .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
 
@@ -1144,7 +1162,7 @@ const createPies = attrArray => {
   // If more than one polygon is selected add drill down functionality to chart
   if (attrArray.length > 1) {
     // Events on the pie sectors
-    d3.selectAll("#pie-container path")
+    d3.selectAll(".pie-container path")
       .on("mouseover", (e, d) => {
         d3.select(e.target).attr("opacity", 0.7)
         d3.select(e.target).style("cursor", "pointer")
@@ -1156,15 +1174,15 @@ const createPies = attrArray => {
       .on("click", drillDown)
 
     // Events on sector labels
-    d3.selectAll("#pie-container text")
+    d3.selectAll(".pie-container text")
       .on("mouseover", (e, d) => {
-        d3.select("#perv-pie")
+        d3.selectAll(".perv-pie")
           .selectAll(`[prop=${d.data.name}]`)
           .attr("opacity", 0.7)
         d3.select(e.target).style("cursor", "pointer")
       })
       .on("mouseout", (e, d) => {
-        d3.select("#perv-pie")
+        d3.selectAll(".perv-pie")
           .selectAll(`[prop=${d.data.name}]`)
           .attr("opacity", 1)
         d3.select(e.target).style("cursor", "pointer")
@@ -1172,10 +1190,9 @@ const createPies = attrArray => {
       .on("click", drillDown)
 
     // Instructory text
-    $("#pie-container").append(
-      $("<p>")
+    $(".pie-container").append(
+      $("<h6>")
         .attr("id", `ratio-title`)
-        .css("font-size", "1.3em")
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
         .text("Select a sector to drill down and reveal additional data.")
     )
@@ -1185,7 +1202,7 @@ const createPies = attrArray => {
   }
 
   // Pie chart title
-  $("#pie-container").prepend(
+  $(".pie-container").prepend(
     $("<h5>")
       .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
@@ -1201,7 +1218,8 @@ const drillDown = (e, d) => {
   const margin = 10
   const height = (width =
     $(window).width() > 768
-      ? $(".leaflet-sidebar-pane").width()
+      ? // ? $(".leaflet-sidebar-pane").width()
+        $("#right-container").width()
       : $(window).width() - 40)
   const radius = Math.min(width - margin * 2, height - margin * 2) / 2
 
@@ -1233,9 +1251,9 @@ const drillDown = (e, d) => {
     .outerRadius(radius * 0.87)
 
   // Clear pie chart pane before adding new svgs
-  d3.select("#pie-container").selectAll("svg, h5, p").remove()
+  d3.selectAll(".pie-container").selectAll("svg, h5, h6").remove()
 
-  $("#pie-container").append(
+  $(".pie-container").append(
     $("<h5>")
       .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
@@ -1248,7 +1266,7 @@ const drillDown = (e, d) => {
   )
 
   const svg = d3
-    .select("#pie-container")
+    .selectAll(".pie-container")
     .append("svg")
     .attr("preserveAspectRatio", "xMidYMax meet")
     .attr("viewBox", [-width / 2, -height / 2, width, height])
@@ -1316,7 +1334,7 @@ const drillDown = (e, d) => {
     .text(d => d.data.neighborhood)
 
   // Add a circle in the center that represents selected pie chart sector
-  const circle = d3.select("#pie-container svg").append("g")
+  const circle = d3.selectAll(".pie-container svg").append("g")
 
   circle
     .append("circle")
@@ -1332,17 +1350,17 @@ const drillDown = (e, d) => {
     .attr("fill", value === "pervious_pct" ? "olivedrab" : "maroon")
 
   // Instructory text
-  $("#pie-container")
+  $(".pie-container")
     .append(
-      $("<p>")
+      $("<h6>")
         .attr("id", `ratio-title`)
-        .css("font-size", "1.3em")
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
         .text("Click center circle to go back up.")
     )
     .append(
-      $("<p>")
+      $("<h6>")
         .attr("id", `ratio-title`)
+        .css("font-size", "0.9em")
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
         .html(`For percentage labels to show, select 40 or fewer NTAs.
         <br/>(${data.length} currently selected)`)

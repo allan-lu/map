@@ -3,6 +3,10 @@ body {
   height: 100%;
 }
 
+h6 {
+  font-weight: normal;
+}
+
 #maxbtn {
   top: 11px;
   right: 65px;
@@ -30,9 +34,47 @@ body {
     1px 1px 0 #fff;
 }
 
-.panel {
+#nbhd-container.panel {
   min-width: 200px;
-  max-width: 300px;
+  max-width: 200px;
+}
+
+#right-container.panel {
+  min-width: 350px;
+}
+
+.nav-pills > a {
+  background-color: #7eba49;
+  border-radius: 0 !important;
+}
+.nav-pills > a:hover {
+  background-color: #437739;
+}
+.nav-pills > .active {
+  background-color: white !important;
+}
+
+.panel-icon {
+  color: white;
+}
+.active > .panel-icon {
+  color: #7eba49;
+}
+.panel-header {
+  color: #7eba49;
+  height: 40px;
+  border: none;
+}
+
+/* Place scroll bar below header */
+.content-inner {
+  position: absolute;
+  top: 75px;
+  left: 0px;
+  bottom: 0px;
+  overflow: auto;
+  border-top: 1px solid #7eba49;
+  width: 100%;
 }
 
 .legend {
@@ -57,23 +99,25 @@ body {
   z-index: 800 !important;
 }
 
+.on-right {
+  right: 0px !important;
+}
+
 .leaflet-sidebar-header,
 .leaflet-sidebar-tabs > li.active,
 .leaflet-sidebar-tabs > ul > li.active {
   background-color: #7eba49 !important;
 }
 
-/* 64-77 Make the scroll bar in the sidebar sit below the header */
+/* Place scroll bar below header */
 .leaflet-sidebar-inner {
   position: absolute;
   top: 40px;
   left: 0px;
   bottom: 0px;
-  background-color: rgba(255, 255, 255, 0.95);
   overflow: auto;
   width: 100%;
 }
-
 .leaflet-sidebar.collapsed > .leaflet-sidebar-inner {
   overflow: hidden;
 }
@@ -94,6 +138,7 @@ body {
 
 /* Prevent the highlighting of text */
 .unselectable,
+.panel-header,
 .leaflet-popup-content,
 .leaflet-control-zoomhome,
 .leaflet-control-layers,
@@ -106,11 +151,15 @@ svg {
 }
 
 @media only screen and (max-width: 768px) {
-  .panel {
+  .panel,
+  .leaflet-control-fullscreen {
     display: none !important;
   }
   .header,
   h1 {
     font-size: 1.2em;
+  }
+  .leaflet-sidebar ~ .leaflet-control-container .leaflet-right {
+    right: 40px !important;
   }
 }

@@ -412,10 +412,11 @@ myMap.addControl(searchControl)
 searchControl.on({
   "search:locationfound": e => {
     const target = e.layer
-    const gid = target.feature.properties.gid
+    const properties = target.feature.properties
+    const gid = properties.gid
+    const bounds = target.getBounds()
 
-    selectNTA(gid)
-    displayAttributes(target.feature.properties)
+    selectAndZoom(properties, gid, bounds, [90, 90])
   }
 })
 
@@ -484,6 +485,19 @@ myMap.on({
     // Add corresponding legend
     myMap.addControl(legend)
   },
+  // Show sidebar when map is fullscreen
+  fullscreenchange: () => {
+    if (myMap.isFullscreen()) {
+      // Show sidebar
+      $("#sidebar").removeClass("d-md-none").addClass("d-block")
+      // Move controls over
+      $(".leaflet-control-container .leaflet-right").removeClass("on-right")
+    } else {
+      sidebar.close()
+      $("#sidebar").removeClass("d-block").addClass("d-md-none")
+      $(".leaflet-control-container .leaflet-right").addClass("on-right")
+    }
+  },
   // While drawing the selector polygon, prevent map layer events
   "draw:toolbaropened": () => {
     ntaCSA.eachLayer(layer => {
@@ -510,4 +524,22 @@ myMap.on({
 
     selectMultiple(layer)
   }
+})
+
+$(document).ready(() => {
+  // Hide sidebar and push right side controls over
+  $("#sidebar").addClass("d-md-none")
+  $(".leaflet-control-container .leaflet-right").addClass("on-right")
+
+  // When selecting a tab in the sidebar activate the same tab in the right panel
+  $(".leaflet-sidebar-tabs li a").click(e => {
+    const href =
+      $(e.target).attr("href") !== undefined
+        ? $(e.target).attr("href").split("-")[0].concat("-p")
+        : $(e.target).parent().attr("href").split("-")[0].concat("-p")
+    $(".nav-pills a").removeClass("active")
+    $(".tab-content div").removeClass(["show", "active"])
+    $(`.nav-pills a[href="${href}"]`).addClass("active")
+    $(href).addClass(["show", "active"])
+  })
 })
