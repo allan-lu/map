@@ -269,9 +269,8 @@ $.getJSON(
         const properties = Object.values(e)[0]
         const bounds = properties.bounds
         $("#nbhd-list").append(
-          $("<a>")
+          $("<li>")
             .addClass([
-              // `gid-${properties.gid}`,
               "col",
               "list-group-item",
               "list-group-item-action",
