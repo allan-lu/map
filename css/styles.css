@@ -46,16 +46,18 @@ h6 {
 .nav-pills > a {
   background-color: #7eba49;
   border-radius: 0 !important;
+  border: 1px #f7f7f7 solid;
 }
+
 .nav-pills > a:hover {
   background-color: #437739;
 }
 .nav-pills > .active {
-  background-color: white !important;
+  background-color: #f7f7f7 !important;
 }
 
 .panel-icon {
-  color: white;
+  color: #f7f7f7;
 }
 .active > .panel-icon {
   color: #7eba49;
@@ -159,7 +161,7 @@ svg {
   .leaflet-control-fullscreen {
     display: none !important;
   }
-  .header,
+  #header,
   h1 {
     font-size: 1.2em;
   }
