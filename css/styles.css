@@ -87,11 +87,11 @@ h6 {
 .legend {
   line-height: 18px;
   color: #555;
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
   padding: 5px;
-  left: 10px;
-  bottom: 10px;
+  left: 0px;
+  bottom: 0px;
 }
 /* Legend items */
 .legend i {
