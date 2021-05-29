@@ -65,7 +65,7 @@ const outfalls = L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     return L.circleMarker(latlng, myStyle.outfalls)
   },
-  interactive: false,
+  interactive: false
   // onEachFeature: onEachOutfall,
 })
 
@@ -73,7 +73,7 @@ const outfalls = L.geoJSON(null, {
 const interceptors = L.geoJSON(null, {
   style: myStyle.interceptors,
   pane: "linesPane",
-  interactive: false,
+  interactive: false
 })
 
 // Sewersheds
@@ -423,6 +423,11 @@ searchControl.on({
     } else {
       selectAndZoom(properties, gid, bounds, [90, 40])
     }
+  },
+  "search:collapsed": () => {
+    const scale = "scale(1)"
+    document.body.style.msTransform = scale // IE 9
+    document.body.style.transform = scale // General
   }
 })
 
