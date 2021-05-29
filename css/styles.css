@@ -145,6 +145,11 @@ h6 {
   margin-right: 0.5em;
 }
 
+/* Leaflet search tool */
+.search-input {
+  font-size: 1.25em;
+}
+
 /* Prevent the highlighting of text */
 .unselectable,
 .panel-header,
