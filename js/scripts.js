@@ -405,6 +405,7 @@ const searchControl = new L.Control.Search({
   propertyName: "neighborhood",
   marker: false,
   initial: false,
+  autoCollapse: true,
   textPlaceholder: "Search Neighborhood"
 })
 myMap.addControl(searchControl)
