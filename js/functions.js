@@ -647,9 +647,6 @@ const highlightSelected = (e, d) => {
 // Unhighlight polygons and bar chart bars on event
 const unhighlightSelected = (e, d) => {
   // Bar chart elements
-  // d3.selectAll(".svg-stack-bar")
-  //   .selectAll(`[geoid=${d.geoid}]`)
-  //   .attr("opacity", 1)
   d3.selectAll(".svg-stack-bar")
     .selectAll(`[geoid=${d.geoid}]`)
     .each(function () {
@@ -684,14 +681,24 @@ const unhighlightSelected = (e, d) => {
 
 // Makes the highlighted bar, sector and polygon stay highlighted
 const leaveHighlight = (e, d, scroll = true) => {
-  // Clear all the previously selected elements
-  geoidArray.forEach(e => {
-    unhighlightSelected(null, e)
-    highlightLeftPanel(e.gid, "rgba(126, 186, 73, 0.3)")
-  })
-  geoidArray.length = 0
-  $(".attr-list li .attr-value span").remove()
-
+  if (!!geoidArray.length) {
+    // If element is already selected, unselect
+    if (geoidArray[0].geoid === d.geoid) {
+      unhighlightSelected(e, d)
+      highlightLeftPanel(d.gid, "rgba(126, 186, 73, 0.3)")
+      geoidArray.length = 0
+      $(".attr-list li .attr-value span").remove()
+      return
+    } else {
+      // Clear all the previously selected elements
+      geoidArray.forEach(e => {
+        unhighlightSelected(null, e)
+        highlightLeftPanel(e.gid, "rgba(126, 186, 73, 0.3)")
+      })
+      geoidArray.length = 0
+      $(".attr-list li .attr-value span").remove()
+    }
+  }
   // Highlight selected element across all charts, maps and panels
   highlightSelected(e, d)
 
@@ -727,6 +734,7 @@ const createStackedBar = (attrObj, properties, total) => {
   const stack = d3.stack().keys(properties)
   const series = stack(data).map(d => (d.forEach(v => (v.key = d.key)), d))
 
+  // Chart placement variables
   const margin = { top: 0, right: 25, bottom: 30, left: 40 }
   const barHeight = 15
   const height =
@@ -737,6 +745,8 @@ const createStackedBar = (attrObj, properties, total) => {
       : $(window).width() > 768
       ? $(".leaflet-sidebar-pane").width()
       : $(window).width() - 40
+
+  // Functions to determine x and y posititons
   const x = d3
     .scaleLinear()
     .domain([0, d3.max(series, d => d3.max(d, d => d[1]))])
@@ -746,6 +756,8 @@ const createStackedBar = (attrObj, properties, total) => {
     .domain(data.map(d => d.geoid))
     .range([margin.top, height - margin.bottom])
     .padding(0.1)
+
+  // Color functions
   const color = d3
     .scaleOrdinal()
     .domain(series.map(d => d.key))
@@ -762,6 +774,7 @@ const createStackedBar = (attrObj, properties, total) => {
         ? ["#9c4f1a", "#5a84ff", "#d46dc3"]
         : ["#c9afef", "#afefc9"]
     )
+  // Axis functions
   const xAxis = g =>
     g
       .attr("transform", `translate(0, ${height - margin.bottom})`)
@@ -790,26 +803,29 @@ const createStackedBar = (attrObj, properties, total) => {
   )
 
   // Add legend
+  // Legend container
   const legend = d3
     .selectAll(".charts-container")
+    .append("div")
+    .classed("d-flex justify-content-around", true)
     .selectAll("legend")
     .data(properties)
     .enter()
     .append("div")
-    .classed("bar-legend", true)
 
+  // Legend elements
   const p = legend.append("p").classed("m-0 d-inline", true)
   p.append("span")
     .classed("key-dot", true)
     .style("background", (d, i) => {
       const color1 = color(i)
       const color2 = altColor(i)
-      return `linear-gradient(-45deg, ${color2}, ${color2} 50%, ${color1} 50%)`
+      return `linear-gradient(-45deg, ${color2} 50%, ${color1} 50%)`
     })
     .style("height", `${barHeight}px`)
     .style("width", `${barHeight}px`)
   p.insert("text")
-    .style("font-size", "0.75em")
+    .style("font-size", "0.8em")
     .text(d => getCategory(d))
 
   // Add bar chart

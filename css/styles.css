@@ -144,10 +144,6 @@ h6 {
   display: inline-block;
   margin-right: 0.5em;
 }
-.bar-legend {
-  float: left;
-  margin-left: 1em;
-}
 
 /* Prevent the highlighting of text */
 .unselectable,
