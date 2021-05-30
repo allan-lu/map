@@ -171,7 +171,7 @@ const selectAndZoom = (props, gid, bounds, pad, scroll = true) => {
     // and the neighborhood list panel
     clearNTAs()
 
-    // // Set zoom level to default
+    // Set zoom level to default
     zoomToBounds(defaultBounds)
 
     // Remove the layers from the selected layer group
