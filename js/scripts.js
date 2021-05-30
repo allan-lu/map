@@ -172,12 +172,13 @@ legend.onAdd = map => {
   let labels = []
   for (let i = 0; i < grades.length; i++) {
     labels.push(
-      `<i style="background: ${colorFunc(grades[i] + 0.01)}"></i>${(
-        grades[i] * 100
-      ).toFixed(1)}%` +
+      `&ensp;<svg style="background: ${colorFunc(
+        grades[i] + 0.01
+      )}; width: 1.5em; height: 1.5em"></svg>&emsp;${(grades[i] * 100).toFixed(1)}%` +
         (grades[i + 1]
           ? "&ndash;" + ((grades[i + 1] - 0.001) * 100).toFixed(1) + "%"
           : "&ndash;100%")
+
     )
   }
   html.push(labels.join("<br>"))
@@ -423,30 +424,24 @@ searchControl.on({
     } else {
       selectAndZoom(properties, gid, bounds, [90, 40])
     }
-  },
-  // "search:collapsed": () => {
-  //   $("body").css({zoom: "100%"})
-  // }
+  }
 })
 
 // Fix Leaflet Search Plugin
 // Make button part of the leaflet-bar class
 $("div.leaflet-control-search.leaflet-control").addClass("leaflet-bar")
 $(".leaflet-control-search .search-button")
-  .css("cssText", "background: none !important;")
+  .css("cssText", "background: none !important; border-bottom: none;")
   .attr("role", "button")
   .addClass("leaflet-bar-part")
 // Replace search png with FA icon
 $(".leaflet-control-search .search-button").append(
   $("<i>").addClass(["fas", "fa-search", "fa-lg"]).css({ color: "black" })
 )
-$(".leaflet-control-search .search-alert")
-  .remove()
-  .insertBefore($(".leaflet-control-search .search-button"))
-//Replace cancel png with FA icon
+// Replace cancel png with FA icon
 $(".leaflet-control-search .search-cancel").css(
   "cssText",
-  "background: none !important; border-bottom: none; margin: 0px;"
+  "background: none !important; border-bottom: none; margin: 0px; display: none;"
 )
 $(".leaflet-control-search .search-cancel").append(
   $("<i>").addClass(["far", "fa-times-circle", "fa-md"]).css({ color: "gray" })

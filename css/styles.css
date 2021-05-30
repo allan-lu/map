@@ -188,9 +188,4 @@ svg {
   .leaflet-sidebar.collapsed ~ .leaflet-control-container .leaflet-right {
     right: 40px !important;
   }
-
-  /* Leaflet search tool */
-  /* .search-input {
-    font-size: 16px;
-  } */
 }
