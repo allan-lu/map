@@ -25,13 +25,8 @@ h6 {
   min-width: 350px;
 }
 
-/* Add halo effect to pie chart labels*/
-.shadow-stroke {
-  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
-    1px 1px 0 #fff;
-}
-
-/* Right panel tabs */
+/* 1 RIGHT PANEL */
+/* Tabs */
 .tab-container {
   border: none;
   margin-bottom: 0px;
@@ -57,8 +52,7 @@ h6 {
 .panel-icon {
   color: #f7f7f7;
 }
-
-/* Right panel header */
+/* Header */
 .panel-header {
   background-color: #437739;
   color: #f7f7f7;
@@ -66,12 +60,6 @@ h6 {
   border: none;
   padding-top: 2px;
 }
-
-/* Icons in the introduction panel */
-.intro-icon {
-  color: #157a75;
-}
-
 /* Place scroll bar below header */
 .content-inner {
   position: absolute;
@@ -82,8 +70,13 @@ h6 {
   /* border-top: 1px solid #7eba49; */
   width: 100%;
 }
+/* Icons in the introduction panel */
+.intro-icon {
+  color: #157a75;
+}
 
-/* Leaflet legend */
+/* 2 MAP CONTAINER */
+/* 2a LEGEND */
 .legend {
   line-height: 18px;
   color: #555;
@@ -102,12 +95,20 @@ h6 {
   opacity: 0.8;
 }
 
-/* Right side Leaflet controls positioning */
+/* 2b BUTTONS */
+.leaflet-control-container {
+  background-color: #f7f7f7;
+}
+/* Right side positioning */
 .on-right {
   right: 0px !important;
 }
+/* Draw toolbar */
+.leaflet-draw-toolbar a {
+  background-clip: border-box !important;
+}
 
-/* Sidebar */
+/* 2c SIDEBAR */
 .leaflet-sidebar-header,
 .leaflet-sidebar-tabs > li.active,
 .leaflet-sidebar-tabs > ul > li.active {
@@ -126,7 +127,7 @@ h6 {
   overflow: hidden;
 }
 
-/* Leaflet popup */
+/* 2d POPUPS */
 .popup-custom .leaflet-popup-tip {
   opacity: 0.65;
   margin: -13px auto 0;
@@ -139,12 +140,19 @@ h6 {
   margin: 6px;
 }
 
+/* 3 CHARTS */
 /* Stacked bar legend */
 .key-dot {
   display: inline-block;
   margin-right: 0.5em;
 }
+/* Add halo effect to pie chart labels*/
+.shadow-stroke {
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+}
 
+/* 4 MISCELLANEOUS */
 /* Prevent the highlighting of text */
 .unselectable,
 .panel-header,
