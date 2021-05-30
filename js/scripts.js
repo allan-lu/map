@@ -67,7 +67,6 @@ const outfalls = new L.geoJSON(null, {
     return L.circleMarker(latlng, myStyle.outfalls)
   },
   interactive: false
-  // onEachFeature: onEachOutfall,
 })
 
 // Sewer Interceptors

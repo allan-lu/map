@@ -1,4 +1,4 @@
-// Geometry layer styling
+// GeoJSON layers styling
 const myStyle = {
   default: {
     color: "#70a641",
