@@ -424,9 +424,9 @@ searchControl.on({
       selectAndZoom(properties, gid, bounds, [90, 40])
     }
   },
-  "search:collapsed": () => {
-    $("body").css({zoom: "100%"})
-  }
+  // "search:collapsed": () => {
+  //   $("body").css({zoom: "100%"})
+  // }
 })
 
 // Fix Leaflet Search Plugin
