@@ -216,9 +216,9 @@ const zoomToBounds = (bounds, pad = [0, 0]) => {
       Math.max(11, myMap.getBoundsZoom(bounds, false, pad))
     )
     const sidebarWidth = $(".leaflet-sidebar-pane").width() - 36
-    let center = L.CRS.Simple.latLngToPoint(bounds.getCenter(), zoom)
+    let center = new L.CRS.Simple.latLngToPoint(bounds.getCenter(), zoom)
     center.x += sidebarWidth
-    center = L.CRS.Simple.pointToLatLng(center, zoom)
+    center = new L.CRS.Simple.pointToLatLng(center, zoom)
     myMap.setView(center, zoom)
   } else {
     myMap.fitBounds(bounds, { padding: pad })
@@ -494,7 +494,7 @@ const selectMultiple = layer => {
 
   // If no polygons selected end drawing
   if (selectedFeatures.length === 0) return
-  
+
   // Create an attribute object of the selected polygons
   const selectedAttr = createAttrObj(selectedFeatures)
   // In the attributes sidebar tab, combine all the properties of the selected polygons

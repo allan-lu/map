@@ -10,6 +10,7 @@
     "leaflet-makimarkers": "^3.1.0",
     "leaflet-search": "^2.9.9",
     "leaflet-sidebar-v2": "^3.2.3",
+    "leaflet.markercluster.layersupport": "^2.0.1",
     "leaflet.zoomhome": "^1.0.0"
   },
   "devDependencies": {},

@@ -119,6 +119,46 @@ const myStyle = {
         ? "#ffc785"
         : "#72d6c9"
     return color
+  },
+  giClusterColors(cluster) {
+    const childCount = cluster.getChildCount()
+    let clusterClass = " gi-cluster-"
+    if (childCount < 10) {
+      clusterClass += "1"
+    } else if (childCount < 50) {
+      clusterClass += "2"
+    } else if (childCount < 150) {
+      clusterClass += "3"
+    } else if (childCount < 450) {
+      clusterClass += "4"
+    } else {
+      clusterClass += "5"
+    }
+    return new L.DivIcon({
+      html: "<div><span>" + childCount + "</span></div>",
+      className: "marker-cluster" + clusterClass,
+      iconSize: new L.Point(40, 40)
+    })
+  },
+  callClusterColors(cluster) {
+    const childCount = cluster.getChildCount()
+    let clusterClass = " call-cluster-"
+    if (childCount < 20) {
+      clusterClass += "1"
+    } else if (childCount < 200) {
+      clusterClass += "2"
+    } else if (childCount < 400) {
+      clusterClass += "3"
+    } else if (childCount < 800) {
+      clusterClass += "4"
+    } else {
+      clusterClass += "5"
+    }
+    return new L.DivIcon({
+      html: "<div><span>" + childCount + "</span></div>",
+      className: "marker-cluster" + clusterClass,
+      iconSize: new L.Point(40, 40)
+    })
   }
 }
 
@@ -126,7 +166,7 @@ const accessToken =
   "pk.eyJ1IjoiYWx1MiIsImEiOiJja2x1bTB3a3Mwa2FnMnVwOXV4YmQ4Z2lmIn0.JQCTZKJ7h2arho-Xcv1Oug"
 
 L.MakiMarkers.accessToken = accessToken
-const tpIcon = L.MakiMarkers.icon({
+const tpIcon = new L.MakiMarkers.icon({
   icon: "water",
   color: "#15abc2",
   size: "s"

@@ -140,6 +140,74 @@ h6 {
   margin: 6px;
 }
 
+/* 2e MARKER CLUSTERS */
+/* Green Infrastructures */
+.gi-cluster-1 {
+  background-color: rgba(255, 89, 89, 0.3);
+}
+.gi-cluster-1 div {
+  background-color: rgba(138, 38, 38, 0.6);
+  color: rgb(207, 207, 207)
+}
+.gi-cluster-2 {
+  background-color: rgba(255, 166, 94, 0.3);
+}
+.gi-cluster-2 div {
+  background-color: rgba(192, 86, 0, 0.6);
+}
+.gi-cluster-3 {
+  background-color: rgba(255, 255, 94, 0.3);
+}
+.gi-cluster-3 div {
+  background-color: rgba(180, 180, 0, 0.6);
+}
+.gi-cluster-4 {
+  background-color: rgba(154, 255, 71, 0.3);
+}
+.gi-cluster-4 div {
+  background-color: rgba(118, 202, 70, 0.6);
+}
+.gi-cluster-5 {
+  background-color: rgba(94, 255, 94, 0.3);
+}
+.gi-cluster-5 div {
+  background-color: rgba(57, 122, 60, 0.6);
+  color: rgb(207, 207, 207)
+}
+/* 311 Calls */
+.call-cluster-1 {
+  background-color: rgba(255, 255, 181, 0.3);
+}
+.call-cluster-1 div {
+  background-color: rgba(253, 255, 129, 0.6);
+}
+.call-cluster-2 {
+  background-color: rgba(224, 122, 88, 0.3);
+}
+.call-cluster-2 div {
+  background-color: rgba(252, 135, 97, 0.6);
+}
+.call-cluster-3 {
+  background-color: rgba(124, 68, 97, 0.3);
+}
+.call-cluster-3 div {
+  background-color: rgba(182, 54, 121, 0.6);
+}
+.call-cluster-4 {
+  background-color: rgba(73, 50, 90, 0.3);
+}
+.call-cluster-4 div {
+  background-color: rgba(80, 18, 123, 0.6);
+  color: rgb(207, 207, 207)
+}
+.call-cluster-5 {
+  background-color: rgba(10, 10, 26, 0.3);
+}
+.call-cluster-5 div {
+  background-color: rgba(0, 0, 4, 0.6);
+  color: rgb(207, 207, 207)
+}
+
 /* 3 CHARTS */
 /* Stacked bar legend */
 .key-dot {

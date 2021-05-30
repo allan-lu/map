@@ -3,11 +3,12 @@ const mapboxURL =
 const year = new Date().getFullYear()
 const gidArray = []
 const geoidArray = []
-const selectedLayerGroup = L.featureGroup({ pane: "pointsPane" })
+const selectedLayerGroup = new L.featureGroup({ pane: "pointsPane" })
+const drawnItems = new L.featureGroup()
 
 // INITIALIZING LAYERS
 // BASE LAYERS
-const mbLight = L.tileLayer(mapboxURL, {
+const mbLight = new L.tileLayer(mapboxURL, {
   id: "mapbox/light-v10",
   tileSize: 512,
   maxZoom: 18,
@@ -15,7 +16,7 @@ const mbLight = L.tileLayer(mapboxURL, {
   accessToken: accessToken
 })
 
-const mbStreets = L.tileLayer(mapboxURL, {
+const mbStreets = new L.tileLayer(mapboxURL, {
   id: "mapbox/streets-v11",
   tileSize: 512,
   maxZoom: 18,
@@ -25,7 +26,7 @@ const mbStreets = L.tileLayer(mapboxURL, {
 
 // OVERLAY LAYERS
 // Sewershed Choropleths
-const ntaCSA = L.geoJSON(null, {
+const ntaCSA = new L.geoJSON(null, {
   style: myStyle.csaChoro,
   onEachFeature: onEachNTAFeature,
   filter: feature => {
@@ -36,7 +37,7 @@ const ntaCSA = L.geoJSON(null, {
   pane: "polygonsPane"
 })
 
-const ntaImpervious = L.geoJSON(null, {
+const ntaImpervious = new L.geoJSON(null, {
   style: myStyle.impervChoro,
   onEachFeature: onEachNTAFeature,
   filter: feature => {
@@ -47,10 +48,10 @@ const ntaImpervious = L.geoJSON(null, {
   pane: "polygonsPane"
 })
 
-const ntaLayerGroup = L.featureGroup([ntaCSA, ntaImpervious])
+const ntaLayerGroup = new L.featureGroup([ntaCSA, ntaImpervious])
 
 // Wastewater Treatment Plants
-const plants = L.geoJSON(null, {
+const plants = new L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     return L.marker(latlng, { icon: tpIcon })
   },
@@ -61,7 +62,7 @@ const plants = L.geoJSON(null, {
 })
 
 // CSO Outfalls
-const outfalls = L.geoJSON(null, {
+const outfalls = new L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     return L.circleMarker(latlng, myStyle.outfalls)
   },
@@ -70,14 +71,14 @@ const outfalls = L.geoJSON(null, {
 })
 
 // Sewer Interceptors
-const interceptors = L.geoJSON(null, {
+const interceptors = new L.geoJSON(null, {
   style: myStyle.interceptors,
   pane: "linesPane",
   interactive: false
 })
 
 // Sewersheds
-const sewersheds = L.geoJSON(null, {
+const sewersheds = new L.geoJSON(null, {
   style: myStyle.sewersheds,
   onEachFeature: onEachSewershed,
   filter: feature => {
@@ -89,63 +90,51 @@ const sewersheds = L.geoJSON(null, {
 })
 
 // Different Sewer Type Areas
-const sewerAreas = L.geoJSON(null, {
+const sewerAreas = new L.geoJSON(null, {
   style: myStyle.sewerAreas,
   onEachFeature: onEachSewerArea,
   pane: "polygonsPane"
 })
 
 // Green infrastructures marker layers by construction status
-const giConstructed = L.geoJSON(null)
-const giInConstruction = L.geoJSON(null)
-const giPlanning = L.geoJSON(null)
-
-// Convert green infrastructure layers to marker clusters
-const giClustersCon = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  singleMarkerMode: true
-})
-const giClustersInCon = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  singleMarkerMode: true
-})
-const giClustersPlan = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  singleMarkerMode: true
-})
-const giClusters = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  singleMarkerMode: true
-})
+const giConstructed = new L.geoJSON(null)
+const giInConstruction = new L.geoJSON(null)
+const giPlanning = new L.geoJSON(null)
+const giGroup = new L.layerGroup([giConstructed, giInConstruction, giPlanning])
 
 // 311 call layers related to sewer issues
-const callsFlooding = L.geoJSON(null)
-const callsOdor = L.geoJSON(null)
-
-// Convert 311 calls layers to marker clusters
-const callsClustersFlood = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  singleMarkerMode: true
-})
-const callsClustersOdor = L.markerClusterGroup({
-  maxClusterRadius: 50,
-  singleMarkerMode: true
-})
-
-const drawnItems = new L.FeatureGroup()
+const callsFlooding = new L.geoJSON(null)
+const callsOdor = new L.geoJSON(null)
+const callsGroup = new L.layerGroup([callsFlooding, callsOdor])
 
 // Create Leaflet map
-const myMap = L.map("mapid", {
-  center: [40.71, -73.93],
+const myMap = new L.map("mapid", {
+  center: [40.71, -73.97],
   zoom: 11,
   layers: [mbLight, ntaCSA, plants, interceptors, drawnItems],
-  zoomControl: false,
-  maxBounds: L.latLngBounds(L.latLng(40.43, -74.7), L.latLng(40.98, -73.1)),
-  minZoom: 10,
-  // fullscreenControl: { pseudoFullscreen: true },
   attributionControl: false,
+  zoomControl: false,
+  doubleClickZoom: false,
+  maxBounds: L.latLngBounds(L.latLng(40.33, -74.7), L.latLng(41.08, -73.2)),
+  minZoom: 10,
   tap: false // remove touch screen problems
 })
+
+// Marker Clusters
+// Green Infrastructures
+const giClusters = new L.markerClusterGroup.layerSupport({
+  maxClusterRadius: 50,
+  singleMarkerMode: true,
+  iconCreateFunction: myStyle.giClusterColors
+}).addTo(myMap)
+giClusters.checkIn(giGroup)
+// 311 Calls
+const callsClusters = new L.markerClusterGroup.layerSupport({
+  maxClusterRadius: 50,
+  singleMarkerMode: true,
+  iconCreateFunction: myStyle.callClusterColors
+}).addTo(myMap)
+callsClusters.checkIn(callsGroup)
 
 // Get bounds for default view
 const defaultBounds = myMap.getBounds()
@@ -154,7 +143,7 @@ const defaultBounds = myMap.getBounds()
 const legend = new L.control({ position: "bottomleft" })
 legend.onAdd = map => {
   let grades, colorFunc, title
-  const div = L.DomUtil.create("div", "info legend unselectable")
+  const div = new L.DomUtil.create("div", "info legend unselectable")
 
   if (map.hasLayer(ntaCSA)) {
     grades = [0, 0.072, 0.273, 0.554, 0.739, 0.861, 0.948]
@@ -200,13 +189,13 @@ const groupedOverlays = {
     "Impervious Percentage": ntaImpervious
   },
   "Green Infrastructures": {
-    Constructed: giClustersCon,
-    "In Construction": giClustersInCon,
-    Designed: giClustersPlan
+    Constructed: giConstructed,
+    "In Construction": giInConstruction,
+    Designed: giPlanning
   },
   "311 Sewer Calls": {
-    "Clogged/Flooding": callsClustersFlood,
-    "Sewer Odor": callsClustersOdor
+    "Clogged/Flooding": callsFlooding,
+    "Sewer Odor": callsOdor
   },
   "Other Layers": {
     "WW Treatment Plants": plants,
@@ -219,12 +208,10 @@ const groupedOverlays = {
 const overlayOptions = {
   exclusiveGroups: ["Neighborhoods"]
 }
-
 const baseMaps = {
   Grayscale: mbLight,
   Streets: mbStreets
 }
-
 const layerControls = new L.control.groupedLayers(
   baseMaps,
   groupedOverlays,
@@ -255,7 +242,7 @@ $.getJSON(
       .map(e => {
         const properties = e.properties
         const neighborhoods = properties.neighborhood.split(/-(?![a-z])|,\s*/)
-        const bounds = L.geoJSON(e).getBounds()
+        const bounds = new L.geoJSON(e).getBounds()
 
         return neighborhoods.map(el => {
           const obj = {}
@@ -357,7 +344,6 @@ $.getJSON(
   "https://data.cityofnewyork.us/resource/uyfj-5xid.geojson?$where=status_gro = 'Constructed' AND the_geom is not null&$limit=25000",
   data => {
     giConstructed.addData(data)
-    giClustersCon.addLayer(giConstructed)
   }
 )
 // In Construction
@@ -365,7 +351,6 @@ $.getJSON(
   "https://data.cityofnewyork.us/resource/uyfj-5xid.geojson?$where=status_gro = 'In Construction' AND the_geom is not null&$limit=25000",
   data => {
     giInConstruction.addData(data)
-    giClustersInCon.addLayer(giInConstruction)
   }
 )
 // Designed
@@ -373,7 +358,6 @@ $.getJSON(
   "https://data.cityofnewyork.us/resource/uyfj-5xid.geojson?$where=status_gro = 'Final Design' AND the_geom is not null&$limit=25000",
   data => {
     giPlanning.addData(data)
-    giClustersPlan.addLayer(giPlanning)
   }
 )
 
@@ -385,7 +369,6 @@ $.getJSON(
   } AND complaint_type in ('Indoor Sewage', 'Industrial Waste', 'Sewer') AND (descriptor like '%25IDG)' OR descriptor like '%25SC)' OR descriptor like '%25SA1)' OR descriptor like '%25SA)' OR descriptor like '%25SJ)') AND location is not null&$limit=25000`,
   data => {
     callsFlooding.addData(data)
-    callsClustersFlood.addLayer(callsFlooding)
   }
 )
 // Sewer Odor
@@ -395,7 +378,6 @@ $.getJSON(
   } AND complaint_type in ('Indoor Sewage', 'Industrial Waste', 'Sewer') AND (descriptor like '%25SA2)' OR descriptor like '%25ICB)') AND location is not null&$limit=5000`,
   data => {
     callsOdor.addData(data)
-    callsClustersOdor.addLayer(callsOdor)
   }
 )
 
