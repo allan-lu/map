@@ -146,9 +146,10 @@ h6 {
 }
 
 /* Leaflet search tool */
-/* .search-input {
-  font-size: 1.25em;
-} */
+.search-input {
+  font-size: 1.3em;
+}
+
 
 /* Prevent the highlighting of text */
 .unselectable,

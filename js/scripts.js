@@ -423,13 +423,36 @@ searchControl.on({
     } else {
       selectAndZoom(properties, gid, bounds, [90, 40])
     }
-  },
-  "search:collapsed": () => {
-    const scale = "scale(1)"
-    document.body.style.msTransform = scale // IE 9
-    document.body.style.transform = scale // General
   }
+  // "search:collapsed": () => {
+  //   const scale = "scale(1)"
+  //   document.body.style.msTransform = scale // IE 9
+  //   document.body.style.transform = scale // General
+  // }
 })
+
+// Fix Leaflet Search Plugin
+// Make button part of the leaflet-bar class
+$("div.leaflet-control-search.leaflet-control").addClass("leaflet-bar")
+$(".leaflet-control-search .search-button")
+  .css("cssText", "background: none !important;")
+  .attr("role", "button")
+  .addClass("leaflet-bar-part")
+// Replace search png with FA icon
+$(".leaflet-control-search .search-button").append(
+  $("<i>").addClass(["fas", "fa-search", "fa-lg"]).css({ color: "black" })
+)
+$(".leaflet-control-search .search-alert")
+  .remove()
+  .insertBefore($(".leaflet-control-search .search-button"))
+//Replace cancel png with FA icon
+$(".leaflet-control-search .search-cancel").css(
+  "cssText",
+  "background: none !important; border-bottom: none; margin: 0px;"
+)
+$(".leaflet-control-search .search-cancel").append(
+  $("<i>").addClass(["far", "fa-times-circle", "fa-md"]).css({ color: "gray" })
+)
 
 // Leaflet sidebar
 const sidebar = L.control
@@ -440,6 +463,10 @@ const sidebar = L.control
     position: "right"
   })
   .addTo(myMap)
+
+// Hide sidebar and push right side controls over
+$("#sidebar").addClass("d-lg-none")
+$(".leaflet-control-container .leaflet-right").addClass("on-right")
 
 // Rectangular area selector
 const drawOptions = {
@@ -538,10 +565,6 @@ myMap.on({
 })
 
 $(document).ready(() => {
-  // Hide sidebar and push right side controls over
-  $("#sidebar").addClass("d-lg-none")
-  $(".leaflet-control-container .leaflet-right").addClass("on-right")
-
   // When selecting a tab in the sidebar activate the same tab in the right panel
   $(".leaflet-sidebar-tabs li a").click(e => {
     const href =
