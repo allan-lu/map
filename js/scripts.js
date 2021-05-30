@@ -174,7 +174,7 @@ legend.onAdd = map => {
     labels.push(
       `&ensp;<svg style="background: ${colorFunc(
         grades[i] + 0.01
-      )}; border: 1px solid black; width: 1.3em; height: 1.3em"></svg>&emsp;${(
+      )}; opacity: 0.6; border: 1px solid black; width: 1.3em; height: 1.3em"></svg>&emsp;${(
         grades[i] * 100
       ).toFixed(1)}%` +
         (grades[i + 1]
