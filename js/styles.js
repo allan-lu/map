@@ -22,8 +22,8 @@ const myStyle = {
   },
   selectAndHighlight: {
     weight: 2,
-    color: "#c482b9",
-    fillColor: "#e872e8"
+    color: "#8b4596",
+    fillColor: "#d234eb"
   },
   csaChoro(feature) {
     return {
