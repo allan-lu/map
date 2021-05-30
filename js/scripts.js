@@ -142,7 +142,7 @@ const myMap = L.map("mapid", {
   zoomControl: false,
   maxBounds: L.latLngBounds(L.latLng(40.43, -74.7), L.latLng(40.98, -73.1)),
   minZoom: 10,
-  fullscreenControl: { pseudoFullscreen: true },
+  // fullscreenControl: { pseudoFullscreen: true },
   attributionControl: false,
   tap: false // remove touch screen problems
 })
@@ -151,7 +151,7 @@ const myMap = L.map("mapid", {
 const defaultBounds = myMap.getBounds()
 
 // Add CSA percentage legend
-const legend = L.control({ position: "bottomleft" })
+const legend = new L.control({ position: "bottomleft" })
 legend.onAdd = map => {
   let grades, colorFunc, title
   const div = L.DomUtil.create("div", "info legend unselectable")
@@ -225,9 +225,11 @@ const baseMaps = {
   Streets: mbStreets
 }
 
-const layerControls = L.control
-  .groupedLayers(baseMaps, groupedOverlays, overlayOptions)
-  .addTo(myMap)
+const layerControls = new L.control.groupedLayers(
+  baseMaps,
+  groupedOverlays,
+  overlayOptions
+).addTo(myMap)
 
 // Get NTA geoJSON data
 $.getJSON(
@@ -397,9 +399,17 @@ $.getJSON(
   }
 )
 
+// Add fullscreen control
+const fullscreen = new L.Control.Fullscreen({
+  title: {
+    false: "Maximize",
+    true: "Minimize"
+  },
+  pseudoFullscreen: true
+}).addTo(myMap)
+
 // Add home zoom control
-const zoomHome = L.Control.zoomHome()
-zoomHome.addTo(myMap)
+const zoomHome = new L.Control.zoomHome().addTo(myMap)
 
 // Add search feature control to Leaflet map
 const searchControl = new L.Control.Search({
@@ -408,9 +418,8 @@ const searchControl = new L.Control.Search({
   marker: false,
   initial: false,
   autoCollapse: true,
-  textPlaceholder: "Neighborhood..."
-})
-myMap.addControl(searchControl)
+  textPlaceholder: "Search neighborhood"
+}).addTo(myMap)
 
 // When a feature is found, select the feature
 searchControl.on({
@@ -449,14 +458,12 @@ $(".leaflet-control-search .search-cancel").append(
 )
 
 // Leaflet sidebar
-const sidebar = L.control
-  .sidebar({
-    autopan: true,
-    closeButton: true,
-    container: "sidebar",
-    position: "right"
-  })
-  .addTo(myMap)
+const sidebar = new L.control.sidebar({
+  autopan: true,
+  closeButton: true,
+  container: "sidebar",
+  position: "right"
+}).addTo(myMap)
 
 // Hide sidebar and push right side controls over
 $("#sidebar").addClass("d-lg-none")
@@ -515,7 +522,7 @@ myMap.on({
   // When a map layer is added:
   overlayadd: layer => {
     // Add corresponding legend
-    myMap.addControl(legend)
+    legend.addTo(myMap)
   },
   // Show sidebar when map is fullscreen
   fullscreenchange: () => {
