@@ -406,7 +406,7 @@ const searchControl = new L.Control.Search({
   marker: false,
   initial: false,
   autoCollapse: true,
-  textPlaceholder: "Search Neighborhood"
+  textPlaceholder: "Neighborhood..."
 })
 myMap.addControl(searchControl)
 
@@ -423,12 +423,12 @@ searchControl.on({
     } else {
       selectAndZoom(properties, gid, bounds, [90, 40])
     }
+  },
+  "search:collapsed": () => {
+    const scale = "scale(1)"
+    document.body.style.msTransform = scale // IE 9
+    document.body.style.transform = scale // General
   }
-  // "search:collapsed": () => {
-  //   const scale = "scale(1)"
-  //   document.body.style.msTransform = scale // IE 9
-  //   document.body.style.transform = scale // General
-  // }
 })
 
 // Fix Leaflet Search Plugin
@@ -453,6 +453,7 @@ $(".leaflet-control-search .search-cancel").css(
 $(".leaflet-control-search .search-cancel").append(
   $("<i>").addClass(["far", "fa-times-circle", "fa-md"]).css({ color: "gray" })
 )
+$(".leaflet-control-search input.search-input").attr("onsubmit", 'document.body.style.zoom="100%"')
 
 // Leaflet sidebar
 const sidebar = L.control

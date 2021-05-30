@@ -146,10 +146,9 @@ h6 {
 }
 
 /* Leaflet search tool */
-.search-input {
-  font-size: 1.3em;
-}
-
+/* .search-input {
+  font-size: 16px;
+} */
 
 /* Prevent the highlighting of text */
 .unselectable,
@@ -194,4 +193,9 @@ svg {
   .leaflet-sidebar.collapsed ~ .leaflet-control-container .leaflet-right {
     right: 40px !important;
   }
+
+  /* Leaflet search tool */
+  /* .search-input {
+    font-size: 16px;
+  } */
 }
