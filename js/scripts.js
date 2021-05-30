@@ -496,7 +496,7 @@ L.drawLocal.draw.toolbar.buttons.rectangle = "Rectangle select"
 L.drawLocal.draw.toolbar.buttons.circle = "Circle select"
 L.drawLocal.edit.toolbar.buttons.edit = "Edit selector polygon"
 L.drawLocal.edit.toolbar.buttons.editDisabled = "No selector polygon to edit"
-L.drawLocal.edit.toolbar.buttons.remove = "Clear selection"
+L.drawLocal.edit.toolbar.buttons.remove = "Clear selections"
 L.drawLocal.edit.toolbar.buttons.removeDisabled = "No polygons selectedd"
 
 // Remove options from delete drawn layers button

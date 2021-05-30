@@ -204,7 +204,7 @@ const selectAndZoom = (props, gid, bounds, pad, scroll = true) => {
   // Change CSS of Leaflet Draw delete button to "enabled"
   $(".leaflet-draw-edit-remove")
     .removeClass("leaflet-disabled")
-    .prop("title", "Delete selection")
+    .prop("title", "Clear selection")
 }
 
 // Zoom to given bounds
@@ -494,7 +494,7 @@ const selectMultiple = layer => {
 
   // If no polygons selected end drawing
   if (selectedFeatures.length === 0) return
-
+  
   // Create an attribute object of the selected polygons
   const selectedAttr = createAttrObj(selectedFeatures)
   // In the attributes sidebar tab, combine all the properties of the selected polygons
@@ -582,7 +582,7 @@ const combineProperties = arr => {
       // Add attribute value to array
       attrObj.hasOwnProperty(attr)
         ? attrObj[attr].push(value)
-        : (attrObj[attr] = new Array())
+        : (attrObj[attr] = [value])
     }
   }
 
