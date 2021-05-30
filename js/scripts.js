@@ -425,9 +425,7 @@ searchControl.on({
     }
   },
   "search:collapsed": () => {
-    const scale = "scale(1)"
-    document.body.style.msTransform = scale // IE 9
-    document.body.style.transform = scale // General
+    $("body").css({zoom: "100%"})
   }
 })
 
@@ -453,7 +451,6 @@ $(".leaflet-control-search .search-cancel").css(
 $(".leaflet-control-search .search-cancel").append(
   $("<i>").addClass(["far", "fa-times-circle", "fa-md"]).css({ color: "gray" })
 )
-$(".leaflet-control-search input.search-input").attr("onsubmit", 'document.body.style.zoom="100%"')
 
 // Leaflet sidebar
 const sidebar = L.control
