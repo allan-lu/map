@@ -58,7 +58,7 @@ const plants = new L.geoJSON(null, {
   onEachFeature: onEachTP,
   filter: feature => {
     return feature.properties.wpcp !== null
-  }
+  },
 })
 
 // CSO Outfalls

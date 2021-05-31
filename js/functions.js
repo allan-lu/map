@@ -844,6 +844,7 @@ const createStackedBar = (attrObj, properties, total) => {
     .join("g")
     .classed("svg-stack-bar", true)
     .attr("fill", d => color(d.key))
+    .attr("cursor", "pointer")
     .selectAll("rect")
     .data(d => d)
     .join("rect")
@@ -882,6 +883,7 @@ const createStackedBar = (attrObj, properties, total) => {
     .attr("text-anchor", "end")
     .attr("font-family", "sans-serif")
     .attr("font-size", 10)
+    .attr("cursor", "pointer")
     .selectAll("text")
     .data(data)
     .join("text")
@@ -903,7 +905,7 @@ const createStackedBar = (attrObj, properties, total) => {
 
   // Add axis labels
   svg.append("g").call(xAxis)
-  svg.append("g").call(yAxis)
+  svg.append("g").attr("cursor", "pointer").call(yAxis)
 
   // Add mouse events to the y-axis's labels
   svg
@@ -997,6 +999,7 @@ const createChart = (attrObj, property) => {
     .append("g")
     .classed("svg-bar", true)
     .attr("fill", "#5175b0")
+    .attr("cursor", "pointer")
     .selectAll("rect")
     .data(data)
     .join("rect")
@@ -1021,6 +1024,7 @@ const createChart = (attrObj, property) => {
     .attr("text-anchor", "end")
     .attr("font-family", "sans-serif")
     .attr("font-size", 10)
+    .attr("cursor", "pointer")
     .selectAll("text")
     .data(data)
     .join("text")
@@ -1048,7 +1052,7 @@ const createChart = (attrObj, property) => {
 
   // Add the axes and axis labels
   svg.append("g").call(xAxis)
-  svg.append("g").call(yAxis)
+  svg.append("g").attr("cursor", "pointer").call(yAxis)
 
   // Add mouse events to the y-axis's labels
   svg
@@ -1182,29 +1186,27 @@ const createPies = attrArray => {
   if (attrArray.length > 1) {
     // Events on the pie sectors
     d3.selectAll(".pie-container path")
+      .style("cursor", "pointer")
       .on("mouseover", (e, d) => {
         d3.select(e.target).attr("opacity", 0.7)
-        d3.select(e.target).style("cursor", "pointer")
       })
       .on("mouseout", (e, d) => {
         d3.select(e.target).attr("opacity", 1)
-        d3.select(e.target).style("cursor", "pointer")
       })
       .on("click", drillDown)
 
     // Events on sector labels
     d3.selectAll(".pie-container text")
+      .style("cursor", "pointer")
       .on("mouseover", (e, d) => {
         d3.selectAll(".perv-pie")
           .selectAll(`[prop=${d.data.name}]`)
           .attr("opacity", 0.7)
-        d3.select(e.target).style("cursor", "pointer")
       })
       .on("mouseout", (e, d) => {
         d3.selectAll(".perv-pie")
           .selectAll(`[prop=${d.data.name}]`)
           .attr("opacity", 1)
-        d3.select(e.target).style("cursor", "pointer")
       })
       .on("click", drillDown)
 
@@ -1296,6 +1298,7 @@ const drillDown = (e, d) => {
     .append("g")
     .classed("svg-arcs", true)
     .attr("stroke", "white")
+    .attr("cursor", "pointer")
     .selectAll("path")
     .data(arcs)
     .join("path")
@@ -1322,6 +1325,7 @@ const drillDown = (e, d) => {
     .append("g")
     .attr("font-family", "sans-serif")
     .attr("font-size", "0.8em")
+    .attr("cursor", "pointer")
     .classed("shadow-stroke", true)
     .selectAll("text")
     .data(arcs)
