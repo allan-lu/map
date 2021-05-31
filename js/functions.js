@@ -216,9 +216,9 @@ const zoomToBounds = (bounds, pad = [0, 0]) => {
       Math.max(11, myMap.getBoundsZoom(bounds, false, pad))
     )
     const sidebarWidth = $(".leaflet-sidebar-pane").width() - 36
-    let center = new L.CRS.Simple.latLngToPoint(bounds.getCenter(), zoom)
+    let center = L.CRS.Simple.latLngToPoint(bounds.getCenter(), zoom)
     center.x += sidebarWidth
-    center = new L.CRS.Simple.pointToLatLng(center, zoom)
+    center = L.CRS.Simple.pointToLatLng(center, zoom)
     myMap.setView(center, zoom)
   } else {
     myMap.fitBounds(bounds, { padding: pad })
