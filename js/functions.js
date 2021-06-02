@@ -270,9 +270,8 @@ const clearNTAs = () => {
 
   // Remove charts from empty container and display text
   d3.selectAll(".charts-blank, .pie-blank").classed("d-block", true)
-  d3.selectAll(".charts-container, .pie-container")
-    .selectAll("svg, h5, p")
-    .remove()
+  d3.selectAll(".charts-container *:not(.charts-blank)").remove()
+  d3.selectAll(".pie-container *:not(.pie-blank)").remove()
 
   // Change CSS of Leaflet Draw delete button to "disabled"
   $(".leaflet-draw-edit-remove")
@@ -932,7 +931,7 @@ const createChart = (attrObj, property) => {
   const dataFormat = property.includes("pct") ? ".1%" : ",~r"
 
   // Hide the text that's displayed when no polygons are selected
-  d3.selectAll(".charts-container charts-blank")
+  d3.selectAll(".charts-container .charts-blank")
     .classed("d-none", true)
     .classed("d-block", false)
 
@@ -1121,7 +1120,7 @@ const createPies = attrArray => {
   d3.selectAll(".pie-container .pie-blank")
     .classed("d-none", true)
     .classed("d-block", false)
-  d3.selectAll(".pie-container").selectAll("svg, h5, h6").remove()
+  d3.selectAll(".pie-container *:not(.pie-blank)").remove()
 
   // Pie chart container
   const svg = d3
@@ -1213,7 +1212,6 @@ const createPies = attrArray => {
     // Instructory text
     $(".pie-container").append(
       $("<h6>")
-        .attr("id", `ratio-title`)
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
         .text("Select a sector to drill down and reveal additional data.")
     )
@@ -1225,7 +1223,6 @@ const createPies = attrArray => {
   // Pie chart title
   $(".pie-container").prepend(
     $("<h5>")
-      .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
       .text(title)
   )
@@ -1273,11 +1270,10 @@ const drillDown = (e, d) => {
     .outerRadius(radius * 0.87)
 
   // Clear pie chart pane before adding new svgs
-  d3.selectAll(".pie-container").selectAll("svg, h5, h6").remove()
+  d3.selectAll(".pie-container").selectAll("svg, h5, h6:not(.pie-blank)").remove()
 
   $(".pie-container").append(
     $("<h5>")
-      .attr("id", `ratio-title`)
       .addClass(["text-wrap", "font-weight-bold", "text-center", "p-0", "m-0"])
       .text(
         `Percentage of ${d3
@@ -1367,7 +1363,7 @@ const drillDown = (e, d) => {
       d3.select(e.target).style("cursor", "pointer")
     })
     .on("mouseout", e => d3.select(e.target).attr("opacity", 1))
-    .on("click", e => createPies(data))
+    .on("click", () => createPies(data))
     .attr("cx", 0)
     .attr("cy", 0)
     .attr("r", radius - width / 6)
@@ -1377,13 +1373,11 @@ const drillDown = (e, d) => {
   $(".pie-container")
     .append(
       $("<h6>")
-        .attr("id", `ratio-title`)
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
         .text("Click center circle to go back up.")
     )
     .append(
       $("<h6>")
-        .attr("id", `ratio-title`)
         .css("font-size", "0.9em")
         .addClass(["text-wrap", "text-center", "p-0", "m-0"])
         .html(`For percentage labels to show, select 40 or fewer NTAs.
