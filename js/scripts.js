@@ -422,7 +422,7 @@ searchControl.on({
 // Make button part of the leaflet-bar class
 $("div.leaflet-control-search.leaflet-control").addClass("leaflet-bar")
 $(".leaflet-control-search .search-button")
-  .css("cssText", "background: none !important; border-bottom: none;")
+  .css("cssText", "background: #f7f7f7 !important; border-bottom: none;")
   .attr("role", "button")
   .addClass("leaflet-bar-part")
 // Replace search png with FA icon
