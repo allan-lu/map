@@ -376,7 +376,7 @@ const renameProperty = (prop, value) => {
       value = (value * 100.0).toFixed(2) + "%"
       break
     case "calls_311":
-      attribute = `311 Calls in ${year - 1} Related to Sewer/Sewage Incidents`
+      attribute = "311 Calls in 2020 Related to Sewer/Sewage Incidents"
       value = value.toLocaleString("en")
       break
     case "csa_pct":
