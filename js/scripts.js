@@ -340,39 +340,33 @@ $.getJSON(
 // Get green infrastructure geoJSON data
 // Constructed
 $.getJSON(
-  // "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
-  "https://data.cityofnewyork.us/resource/bs59-f3nu.geojson?$where=status_gro = 'Constructed' AND the_geom is not null&$limit=25000",
+  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
   data => {
-    // var items = data.features.filter(feature => feature.properties["status_gro"] === "Constructed" && feature.geometry !== null)
-    // giConstructed.addData(items)
-    giConstructed.addData(data)
+    var items = data.features.filter(feature => feature.properties["status_gro"] === "Constructed" && feature.geometry !== null)
+    giConstructed.addData(items)
   }
 )
 // In Construction
 $.getJSON(
-  // "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
-  "https://data.cityofnewyork.us/resource/bs59-f3nu.geojson?$where=status_gro = 'In Construction' AND the_geom is not null&$limit=25000",
+  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
   data => {
-    // var items = data.features.filter(feature => feature.properties["status_gro"] === "In Construction" && feature.geometry !== null)
-    // giInConstruction.addData(items)
-    giInConstruction.addData(data)
+    var items = data.features.filter(feature => feature.properties["status_gro"] === "In Construction" && feature.geometry !== null)
+    giInConstruction.addData(items)
   }
 )
 // Designed
 $.getJSON(
-  // "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
-  "https://data.cityofnewyork.us/resource/bs59-f3nu.geojson?$where=status_gro = 'Final Design' AND the_geom is not null&$limit=25000",
+  "https://raw.githubusercontent.com/allan-lu/js/main/data/nyc-greeninfras-wgs84.geojson",
   data => {
-    // var items = data.features.filter(feature => feature.properties["status_gro"] === "Final Design" && feature.geometry !== null)
-    // giPlanning.addData(items)
-    giPlanning.addData(data)
+    var items = data.features.filter(feature => feature.properties["status_gro"] === "Final Design" && feature.geometry !== null)
+    giPlanning.addData(items)
   }
 )
 
 // Get 311 calls geoJSON data
 // Clogged/Flooding
 $.getJSON(
-  `https://data.cityofnewyork.us/resource/erm2-nwe9.geojson?$where=date_extract_y(created_date)=${year - 1} 
+  `https://data.cityofnewyork.us/resource/erm2-nwe9.geojson?$where=date_extract_y(created_date)=2020 
   AND complaint_type in ('Indoor Sewage', 'Industrial Waste', 'Sewer') AND (descriptor like '%25IDG)' OR descriptor like '%25SC)' OR descriptor like '%25SA1)' OR descriptor like '%25SA)' OR descriptor like '%25SJ)') AND location is not null&$limit=25000`,
   data => {
     callsFlooding.addData(data)
@@ -380,7 +374,7 @@ $.getJSON(
 )
 // Sewer Odor
 $.getJSON(
-  `https://data.cityofnewyork.us/resource/erm2-nwe9.geojson?$where=date_extract_y(created_date)=${year - 1} 
+  `https://data.cityofnewyork.us/resource/erm2-nwe9.geojson?$where=date_extract_y(created_date)=2020 
   AND complaint_type in ('Indoor Sewage', 'Industrial Waste', 'Sewer') AND (descriptor like '%25SA2)' OR descriptor like '%25ICB)') AND location is not null&$limit=5000`,
   data => {
     callsOdor.addData(data)
